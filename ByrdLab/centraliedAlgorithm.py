@@ -333,6 +333,11 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
             for _ in range(self.node_size)
         ]
 
+        worker_grad = [
+                [torch.zeros_like(para, requires_grad=False) for para in server_model.parameters()]
+                for _ in range(self.node_size)
+            ]
+
         for iteration in range(0, self.total_iterations + 1):
             # lastest learning rate
             lr = self.lr_ctrl.get_lr(iteration)
@@ -354,7 +359,7 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
                     test_loss, test_accuracy, lr
                 ))
 
-                
+
             # gradient descent
             for node in self.nodes:
                 features, targets = next(data_iters[node])
@@ -371,10 +376,10 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
                 loss.backward()
                 
                 # store the workers' gradients
-                # for index, para in enumerate(server_model.parameters()):
-                #     worker_grad[node][index].data.zero_()
-                #     worker_grad[node][index].data.add_(para.grad.data, alpha=1)
-                #     worker_grad[node][index].data.add_(para, alpha=self.weight_decay)
+                for index, para in enumerate(server_model.parameters()):
+                    worker_grad[node][index].data.zero_()
+                    worker_grad[node][index].data.add_(para.grad.data, alpha=1)
+                    worker_grad[node][index].data.add_(para, alpha=self.weight_decay)
 
                 # store the worker's momentums
                 if iteration == 0:
@@ -400,7 +405,7 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
             for para, grad in zip(server_model.parameters(), aggrGrad):
                 para.data.sub_(grad, alpha = lr)
 
-        return server_model, loss_path, acc_path
+        return server_model, loss_path, acc_path, worker_grad
     
 class CMomentum_under_DPA_compute_bound(Dist_Dataset_Opt_Env):
     def __init__(self, aggregation, honest_nodes, byzantine_nodes, alpha=0.1, *args, **kw):

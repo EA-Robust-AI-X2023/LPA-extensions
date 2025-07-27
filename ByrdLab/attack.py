@@ -12,7 +12,7 @@ def gaussian(messages, honest_nodes, byzantine_nodes, scale, torch_rng=None):
     # with the same mean and larger variance
     mu = torch.zeros(messages.size(1), dtype=FEATURE_TYPE).to(DEVICE)
     for node in honest_nodes:
-        mu.add_(messages[node], alpha=1/len(honest_nodes))
+        mu.add_(messages[node], alpha = 1 / len(honest_nodes))
     for node in byzantine_nodes:
         messages[node].copy_(mu)
         noise = torch.randn(messages.size(1), dtype=FEATURE_TYPE,

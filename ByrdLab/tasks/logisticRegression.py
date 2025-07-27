@@ -4,7 +4,6 @@ from ByrdLab.library.initialize import RandomInitialize
 from ByrdLab.library.measurements import binary_classification_accuracy
 from ByrdLab.tasks import Task
 import torch
-import torch.autograd
 
 from ByrdLab import FEATURE_TYPE, TARGET_TYPE
 from ByrdLab.tasks.softmaxRegression import order_generator, random_generator
@@ -12,7 +11,7 @@ from ByrdLab.tasks.softmaxRegression import order_generator, random_generator
 num_classes = 2
 
 class LogisticRegressionTask(Task):
-    def __init__(self, data_package: DataPackage, batch_size=32):
+    def __init__(self, data_package: DataPackage, batch_size = 32):
         weight_decay = 0.01
         model = logisticRegression_model(data_package.feature_dimension)
         loss_fn = logistic_regression_loss

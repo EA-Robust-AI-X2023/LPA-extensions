@@ -281,7 +281,7 @@ print('{:12s} record_in_file={}'.format('[System]', record_in_file))
 print('-------------------------------------------')
 
 log('[Start Running]')
-_, loss_path, acc_path = env.run()
+_, loss_path, acc_path, worker_grad = env.run()
 
 
 record = {
@@ -298,7 +298,8 @@ record = {
     'loss_path': loss_path,
     'acc_path': acc_path,
     'fix_seed': fix_seed,
-    'seed': seed
+    'seed': seed,
+    "workers_gradients": worker_grad
 }
 
 if record_in_file:
