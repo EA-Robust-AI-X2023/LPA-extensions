@@ -1,29 +1,5 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@MrFive5555 
-github
-/
-gitignore
-Public
-Code
-Pull requests
-286
-Actions
-Security
-Insights
-gitignore/Python.gitignore
-@astrojuanlu
-astrojuanlu Update Python.gitignore
-Latest commit 8e67b94 on 20 Feb
- History
- 90 contributors
-@arcresu@shiftkey@jwg4@astrojuanlu@GabrielC101@misaelnieto@pmsosa@svkampen@vltr@thedrow@matheussl@Lucretiel
-160 lines (131 sloc)  3.01 KB
+
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
