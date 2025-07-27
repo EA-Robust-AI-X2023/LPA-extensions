@@ -73,6 +73,7 @@ def draw(task_name):
                     file_name = method + '_' + attack_name + '_' + agg_code_name + ''
                     file_path = [taskname, graph_name, partition_names[i][0]]
 
+                print(file_path)
                 record = load_file_in_cache(file_name, path_list=file_path)
                 acc_path = record['acc_path']
                 gradients = record['gradients']
