@@ -19,6 +19,6 @@ conda install pylint
 conda install networkx
 
 # conda with CPU
-# conda install pytorch torchvision torchaudio cpuonly
+# conda install pytorch torchvision torchaudio conda-forge::torchinfo cpuonly
 # conda with cuda
-conda install pytorch torchvision torchaudio cudatoolkit=10.1
+conda install pytorch torchvision torchaudio conda-forge::torchinfo cudatoolkit=10.1

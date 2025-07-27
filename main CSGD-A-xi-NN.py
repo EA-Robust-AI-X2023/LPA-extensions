@@ -1,4 +1,5 @@
 from argsParser import args
+import torchinfo
 
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter
@@ -55,6 +56,7 @@ args.lr_ctrl = 'constant'
 
 data_package = mnist()
 task = NeuralNetworkTask(data_package, batch_size=32)
+print("Model information:\n", torchinfo.summary(task.model))
 
 # w_star = torch.tensor([1], dtype=FEATURE_TYPE)
 # data_package = LeastSquareToySet(set_size=2000, dimension=1, w_star=w_star, noise=0, fix_seed=True)
