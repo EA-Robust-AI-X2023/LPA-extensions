@@ -1,4 +1,7 @@
+from torch.nn.functional import cosine_similarity
 import matplotlib.pyplot as plt
+import itertools
+import torch
 import os
 import sys
 sys.path.append('..')
@@ -72,6 +75,27 @@ def draw(task_name):
 
                 record = load_file_in_cache(file_name, path_list=file_path)
                 acc_path = record['acc_path']
+                gradients = record['gradients']
+                flat_grads = [torch.cat([e.view(-1) for e in g]) for g in gradients]
+                cosine_sims = []
+
+                for k, j in itertools.combinations(range(len(flat_grads)), 2):
+                    cos_sim = cosine_similarity(flat_grads[k].unsqueeze(0), flat_grads[j].unsqueeze(0))
+                    cosine_sims.append(cos_sim.item())
+
+                plt.figure(figsize=(8, 6))
+                plt.hist(cosine_sims, bins=20, edgecolor='black')
+                plt.title("Histogram of pairwise cosine similarities between worker gradients")
+                plt.xlabel("Cosine similarity")
+                plt.ylabel("Frequency")
+                plt.grid(True)
+
+                # Save figure
+                pic_png_path = "../record/'cosine similarities'"
+                file_dir = os.path.dirname(os.path.abspath(__file__))
+                os.makedirs(os.path.dirname(pic_png_path), exist_ok=True)
+                plt.savefig(pic_png_path, format='png', bbox_inches='tight')
+                plt.close()
 
                 x_axis = [r*record['display_interval']
                             for r in range(record['rounds']+1)]

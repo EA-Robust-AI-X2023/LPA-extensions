@@ -94,7 +94,7 @@ class CSGD(Dist_Dataset_Opt_Env):
             for para, grad in zip(server_model.parameters(), aggrGrad):
                 para.data.sub_(grad, alpha = lr)
 
-        return server_model, loss_path, acc_path
+        return server_model, loss_path, acc_path, worker_grad
     
 class CMomentum_compute_hetero(Dist_Dataset_Opt_Env):
     def __init__(self, aggregation, honest_nodes, byzantine_nodes, alpha=0.1, *args, **kw):
@@ -206,11 +206,11 @@ class CMomentum_compute_hetero(Dist_Dataset_Opt_Env):
                 print('Heterogeneity:', heterogeneity.item())
                 hetero_list.append(heterogeneity.item())
 
-        return server_model, loss_path, acc_path, hetero_list
+        return server_model, loss_path, acc_path, hetero_list, worker_full_grad
 
 
 # CSGD under model poisoning attacks
-class CSGD_under_DPA(Dist_Dataset_Opt_Env):
+class CSGD_under_DPA(Dist_Dataçset_Opt_Env):
     def __init__(self, aggregation, honest_nodes, byzantine_nodes, *args, **kw):
         super().__init__(name='CSGD', honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes,  *args, **kw)
         self.aggregation = aggregation
@@ -294,7 +294,7 @@ class CSGD_under_DPA(Dist_Dataset_Opt_Env):
             for para, grad in zip(server_model.parameters(), aggrGrad):
                 para.data.sub_(grad, alpha = lr)
 
-        return server_model, loss_path, acc_path
+        return server_model, loss_path, acc_path, worker_grad
     
 class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
     def __init__(self, aggregation, honest_nodes, byzantine_nodes, alpha=0.1, *args, **kw):
@@ -323,20 +323,16 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
                       for node in self.nodes]
         
         # initialize the stochastic gradients of all workers
-        # worker_grad = [
-        #     [torch.zeros_like(para, requires_grad=False) for para in server_model.parameters()]
-        #     for _ in range(self.node_size)
-        # ]
+        worker_grad = [
+            [torch.zeros_like(para, requires_grad=False) for para in server_model.parameters()]
+            for _ in range(self.node_size)
+        ]
 
         worker_momentum = [
             [torch.zeros_like(para, requires_grad=False) for para in server_model.parameters()]
             for _ in range(self.node_size)
         ]
 
-        worker_grad = [
-                [torch.zeros_like(para, requires_grad=False) for para in server_model.parameters()]
-                for _ in range(self.node_size)
-            ]
 
         for iteration in range(0, self.total_iterations + 1):
             # lastest learning rate
@@ -518,7 +514,7 @@ class CMomentum_under_DPA_compute_bound(Dist_Dataset_Opt_Env):
                 print(f'{iteration}-iteration Bound_A:', Bound_A_max.item())
                 Bound_A_list.append(Bound_A_max.item())  
 
-        return server_model, loss_path, acc_path, Bound_A_list
+        return server_model, loss_path, acc_path, Bound_A_list, worker_full_grad
 
 class CMomentum_under_DPA_compute_variance(Dist_Dataset_Opt_Env):
     def __init__(self, aggregation, honest_nodes, byzantine_nodes, alpha=0.1, *args, **kw):
