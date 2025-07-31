@@ -378,88 +378,141 @@ class adversarial_label_flipping(DataPoisoningAttack):
     
 
 
-class adversarial_anti_softmax_label_flipping(DataPoisoningAttack):
+class adversarial_label_flipping_linear(DataPoisoningAttack):
     def __init__(self):
-        super().__init__(name='adversarial_label_optimal_gradient_flipping')      
+        super().__init__(name='adversarial_label_flipping_linear')
         
-    def run(self, features, labels, num_classes=None, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
+    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
         """
-        features: torch.Tensor [B, d]  -> batch features
-        labels: torch.Tensor   [B]     -> true labels
-        model: softmaxRegression_model
-        This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*
+         features: torch.Tensor [B, d]  -> batch features
+         labels: torch.Tensor   [B]     -> true labels
+         model: softmaxRegression_model
+         This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*
+         It only works for softmax regression !
         """
         features = features.detach()
-        labels = labels.detach()
+        targets = targets.detach()
         model.eval()
 
         logits = model(features)              
-        probs = torch.softmax(logits, dim=1)       
+        probs = torch.softmax(logits, dim=1)         
 
-        W = model.linear.weight                
+        last_linear = None
+        for module in model.modules():
+            if isinstance(module, torch.nn.Linear):
+                last_linear = module
+        if last_linear is None:
+            raise ValueError("Pas de couche nn.Linear trouvée dans le modèle.")
+        
+        W = last_linear.weight  
 
-        # Compute <x_n, W_j> for all n,j
-        inner_x_delta = features @ W.T        
+        num_classes = W.shape[0]    
 
-        # compute Z matrix for all (n,c)
+        # Produit interne <x, Δ_j>
+        inner_x_delta = features.view(features.size(0), -1) @ W.T     
+
+        # Calcul de Z
         I = torch.eye(num_classes, device=features.device).unsqueeze(0)  
-        diff = I - probs.unsqueeze(1)                                    
-        Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)          
+        diff = I - probs.unsqueeze(1)                           
+        Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)         
 
-        # Harmful label: argmax over C (vectorized)
-        harmful_labels = torch.argmax(Z, dim=1)                      
-
-        flipped_labels = torch.where(harmful_labels != labels, harmful_labels, labels)
+        # Sélection du label nuisible
+        harmful_labels = torch.argmax(Z, dim=1)                    
+        flipped_labels = torch.where(harmful_labels != targets, harmful_labels, targets)
 
         return features, flipped_labels
 
     
-class adversarial_last_layer_label_flipping(DataPoisoningAttack):
-    def __init__(self):
-        super().__init__(name='adversarial_label_optimal_gradient_flipping')      
+
+### On commente car ces attaques peuvent être réunies en une seule
+# class adversarial_anti_softmax_label_flipping(DataPoisoningAttack):
+#     def __init__(self):
+#         super().__init__(name='adversarial_label_optimal_gradient_flipping')      
         
-    def run(self, features, labels, num_classes=None, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
-        """
-        features: [B, d] features
-        labels: [B] true labels
-        model: classification model (assumed final layer linear for Z formula)
+#     def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
+#         """
+#         features: torch.Tensor [B, d]  -> batch features
+#         labels: torch.Tensor   [B]     -> true labels
+#         model: softmaxRegression_model
+#         This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*
+#         It only works for softmax regression !
+#         """
+#         features = features.detach()
+#         targets = targets.detach()
+#         model.eval()
+
+#         num_classes = model.linear.weight.shape[0]
+
+
+#         logits = model(features)              
+#         probs = torch.softmax(logits, dim=1)       
+
+#         W = model.linear.weight                
+
+#         # Compute <x_n, W_j> for all n,j
+#         inner_x_delta = features @ W.T        
+
+#         # compute Z matrix for all (n,c)
+#         I = torch.eye(num_classes, device=features.device).unsqueeze(0)  
+#         diff = I - probs.unsqueeze(1)                                    
+#         Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)          
+
+#         # Harmful label: argmax over C (vectorized)
+#         harmful_labels = torch.argmax(Z, dim=1)                      
+
+#         flipped_labels = torch.where(harmful_labels != targets, harmful_labels, targets)
+
+#         return features, flipped_labels
+
+    
+# class adversarial_last_layer_label_flipping(DataPoisoningAttack):
+#     def __init__(self):
+#         super().__init__(name='adversarial_label_optimal_gradient_flipping')      
         
-        This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*, but is 
-        generalized to any model with a linear final layer,
-        """
-        features = features.detach()
-        labels = labels.detach()
-        model.eval()
+#     def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
+#         """
+#         features: [B, d] features
+#         labels: [B] true labels
+#         model: classification model (assumed final layer linear for Z formula)
+        
+#         This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*, but is 
+#         generalized to any model with a linear final layer,
+#         """
+#         features = features.detach()
+#         targets = targets.detach()
+#         model.eval()
 
-        logits = model(features)               
-        probs = torch.softmax(logits, dim=1)         
+#         logits = model(features)               
+#         probs = torch.softmax(logits, dim=1)         
 
-        # Extract final layer weights as Δ (for linear classifier)
-        # Assumes model.fc or model.linear is final layer
-        # Adjust if your model stores weights differently
-        W = list(model.parameters())[-2]        
-        Delta = W                           
+#         # Extract final layer weights as Δ (for linear classifier)
+#         # Assumes model.fc or model.linear is final layer
+#         # Adjust if your model stores weights differently
+#         W = list(model.parameters())[-2]        
+#         Delta = W         
 
-        # Compute <x, Δ_j> for all n, j
-        inner_x_delta = features @ Delta.T       
+#         num_classes = W.shape[0]                  
 
-        # Compute Z for all c, n
-        # Z_c,n = sum_j ( I[c=j] - p_n[j] ) * <x_n, Δ_j>
-        I = torch.eye(num_classes, device=features.device).unsqueeze(0)   
-        diff = I - probs.unsqueeze(1)                                
+#         # Compute <x, Δ_j> for all n, j
+#         inner_x_delta = features @ Delta.T       
 
-        # Broadcast inner_x_delta into correct shape for summation
-        Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)             
+#         # Compute Z for all c, n
+#         # Z_c,n = sum_j ( I[c=j] - p_n[j] ) * <x_n, Δ_j>
+#         I = torch.eye(num_classes, device=features.device).unsqueeze(0)   
+#         diff = I - probs.unsqueeze(1)                                
 
-        # ---- 5️⃣ Choose harmful label per sample
-        best_labels = labels.clone()
-        for i in range(labels.size(0)):
-            true_class = labels[i].item()
-            harmful_class = torch.argmax(Z[i]).item()
-            if harmful_class != true_class:
-                best_labels[i] = harmful_class
+#         # Broadcast inner_x_delta into correct shape for summation
+#         Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)             
 
-        return features, best_labels
+#         # Choose harmful label per sample
+#         best_labels = targets.clone()
+#         for i in range(targets.size(0)):
+#             true_class = targets[i].item()
+#             harmful_class = torch.argmax(Z[i]).item()
+#             if harmful_class != true_class:
+#                 best_labels[i] = harmful_class
+
+#         return features, best_labels
     
 class adversarial_optimal_label_flipping(DataPoisoningAttack):
     def __init__(self):

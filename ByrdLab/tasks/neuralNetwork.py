@@ -136,7 +136,7 @@ class NeuralNetworkTask(Task):
         weight_decay = 0.0085
         # model = VGG('VGG11', data_package.num_classes)
         model = CNNModel(data_package.num_classes)
-        # model = MLP(data_package.num_classes)
+        #model = MLP(data_package.num_classes)
 
         # from torchvision.models import resnet18
         # model = resnet18(weights=ResNet18_Weights.DEFAULT)
