@@ -366,7 +366,7 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
                 # data poisoning attack
                 if node in self.byzantine_nodes:
                     if "omniscient" in self.attack.name:
-                        features, targets = self.attack.run(features, targets, num_classes = self.model[-1].out_features ,model=server_model, loss=self.loss_fn)
+                        features, targets = self.attack.run(features, targets ,model=server_model, loss=self.loss_fn)
                     else:
                         features, targets = self.attack.run(features, targets, model=server_model)
 
@@ -744,7 +744,10 @@ class CMomentum_under_DPA_compute_hetero_bound(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    features, targets = self.attack.run(features, targets, model=server_model)
+                    if "omniscient" in self.attack.name:
+                        features, targets = self.attack.run(features, targets ,model=server_model, loss=self.loss_fn)
+                    else:
+                        features, targets = self.attack.run(features, targets, model=server_model)
 
                 features = features.to(DEVICE)
                 targets = targets.to(DEVICE)

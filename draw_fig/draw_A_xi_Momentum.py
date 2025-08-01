@@ -22,15 +22,16 @@ method = 'CMomentum'
 
 def draw(task_name):
     datasets = ['mnist', 'cifar10']
-
+    datasets = ['mnist']
     suffix_list = [
-        ('_Bound_A', 'Disturbance of static label flipping'),
-        ('_Bound_A', 'Disturbance of dynamic label flipping'),
-        ('_hetero_list', 'Heterogeneity'),
+        #('_mean_Bound_A', 'Disturbance of static label flipping'),
+        #('_Bound_A', 'Disturbance of dynamic label flipping'),
+        ('_mean_Bound_A', 'Disturbance of gradient attack label flipping'),
+        #('_mean_hetero_list', 'Heterogeneity'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -72,6 +73,9 @@ def draw(task_name):
                 elif label == 'Disturbance of dynamic label flipping':
                     file_name = method + '_furthest_label_flipping_mean' + suffix
                     file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
+                elif label == 'Disturbance of gradient attack label flipping':
+                    file_name = method + '_adversarial_label_flipping_linear' + suffix
+                    file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
                 record = load_file_in_cache(file_name, path_list=file_path)
                 x_axis = [r*interval for r in range(rounds+1)]
                 axes[l][i].plot(x_axis, record, '-', color=color, marker=marker, label=label, markevery=20, linewidth=4, markersize=20)
@@ -107,13 +111,15 @@ def draw_mnist(task_name):
 
 
     suffix_list = [
-        ('_Bound_A', 'Disturbance of static label flipping'),
-        ('_Bound_A', 'Disturbance of dynamic label flipping'),
-        ('_hetero_list', 'Heterogeneity'),
+        #('_Bound_A', 'Disturbance of static label flipping'),
+        #('_Bound_A', 'Disturbance of dynamic label flipping'),
+        ('_mean_Bound_A', 'Disturbance of gradient attack label flipping'),
+
+        #('_mean_hetero_list', 'Heterogeneity'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -150,6 +156,9 @@ def draw_mnist(task_name):
             elif label == 'Disturbance of dynamic label flipping':
                 file_name = method + '_furthest_label_flipping_mean' + suffix
                 file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
+            elif label == 'Disturbance of gradient attack label flipping':
+                file_name = method + '_adversarial_label_flipping_linear' + suffix
+                file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
             record = load_file_in_cache(file_name, path_list=file_path)
             x_axis = [r*interval for r in range(rounds+1)]
             axes[i].plot(x_axis, record, '-', color=color, marker=marker, label=label, markevery=20, linewidth=4, markersize=20)
@@ -182,4 +191,4 @@ def draw_mnist(task_name):
 
 if __name__ == '__main__':
     draw_mnist('SR')
-    draw('NeuralNetwork')
+    #draw('NeuralNetwork')

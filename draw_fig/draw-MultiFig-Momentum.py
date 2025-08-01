@@ -12,6 +12,7 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 graph_name = 'Centralized_n=10_b=1'
 # attack_name = 'label_flipping'
 attack_name = 'furthest_label_flipping'
+#attack_name = 'adversarial_label_flipping_linear'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -22,19 +23,22 @@ __CACHE_PATH__ = os.path.join(__FILE_DIR__, os.path.pardir, __CACHE_DIR__)
 set_cache_path(__CACHE_PATH__)
 
 def draw(task_name):
-    datasets = ['mnist', 'cifar10']
+    #datasets = ['mnist', 'cifar10']
     # datasets = ['cifar10']
-    aggregations = [
-        ('mean', 'Baseline'), 
-        ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
-        ('faba', 'FABA'), 
-        ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
-    ]
+    datasets = ['mnist']
+
+    # aggregations = [
+    #     ('mean', 'Baseline'), 
+    #     ('mean', 'Mean'), 
+    #     ('trimmed_mean', 'TriMean'),
+    #     ('faba', 'FABA'), 
+    #     ('CC', 'CC'),
+    #     ('LFighter', 'LFighter'),
+    aggregations = [('mean', 'Mean')]
+    
     partition_names = [
         ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -112,17 +116,18 @@ def draw_mnist(task_name):
     dataset = 'mnist'
 
 
-    aggregations = [
-        ('mean', 'Baseline'), 
-        ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
-        ('faba', 'FABA'), 
-        ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
-    ]
+    # aggregations = [
+    #     ('mean', 'Baseline'), 
+    #     ('mean', 'Mean'), 
+    #     ('trimmed_mean', 'TriMean'),
+    #     ('faba', 'FABA'), 
+    #     ('CC', 'CC'),
+    #     ('LFighter', 'LFighter'),
+    aggregations = [('mean', 'Mean')]
+    
     partition_names = [
         ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -185,5 +190,5 @@ def draw_mnist(task_name):
     plt.show()
 
 if __name__ == '__main__':
-    draw('NeuralNetwork')
+    #draw('NeuralNetwork')
     draw_mnist('SR')

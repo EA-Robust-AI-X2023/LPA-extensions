@@ -7,6 +7,8 @@ import torch
 from ByrdLab import FEATURE_TYPE, DEVICE
 from ByrdLab.library.RandomNumberGenerator import RngPackage
 from ByrdLab.library.tool import MH_rule
+from ByrdLab.tasks.neuralNetwork import CNNModel, MLP
+from ByrdLab.tasks.softmaxRegression import softmaxRegression_model
 
 def gaussian(messages, honest_nodes, byzantine_nodes, scale, torch_rng=None):
     # with the same mean and larger variance
@@ -417,7 +419,7 @@ class adversarial_label_flipping_linear(DataPoisoningAttack):
         Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)         
 
         # Sélection du label nuisible
-        harmful_labels = torch.argmax(Z, dim=1)                    
+        harmful_labels = torch.argmin(Z, dim=1)                    
         flipped_labels = torch.where(harmful_labels != targets, harmful_labels, targets)
 
         return features, flipped_labels
@@ -514,11 +516,11 @@ class adversarial_label_flipping_linear(DataPoisoningAttack):
 
 #         return features, best_labels
     
-class adversarial_optimal_label_flipping(DataPoisoningAttack):
+class adversarial_omniscient_label_flipping_gradient(DataPoisoningAttack):
     def __init__(self):
         super().__init__(name='adversarial_label_optimal_gradient_flipping')      
-        
-    def run(self, features, labels, num_classes=None, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
+
+    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
         """
         features: torch.Tensor -> batch of features [B, d]
         labels: torch.Tensor -> true labels [B]
@@ -529,21 +531,26 @@ class adversarial_optimal_label_flipping(DataPoisoningAttack):
         This function flips labels to maximize the -dot product between the honest gradient and the flipped gradient.
         It computes gradients directly
         """
+
+        
+    
         features = features.detach()
-        labels = labels.detach()
+        targets = targets.detach()
         model.eval()
 
-        batch_size = labels.size(0)
-        flipped_labels = labels.clone()
+        batch_size = targets.size(0)
+        flipped_labels = targets.clone()
+
+        num_classes = get_num_classes(model)
 
         for idx in range(batch_size):
             x_i = features[idx:idx+1]    # Single sample (shape: [1, d])
-            y_i = labels[idx:idx+1]      # True label (shape: [1])
+            y_i = targets[idx:idx+1]      # True label (shape: [1])
 
             # Honest gradient for true label
             grad_true = self.compute_gradient(model, loss, x_i, y_i)
 
-            max_dist = -float('inf')
+            min_dist = float('inf')
             best_label = y_i.clone()
 
             # Iterate over all possible flipped labels
@@ -551,24 +558,44 @@ class adversarial_optimal_label_flipping(DataPoisoningAttack):
                 if c == y_i.item():
                     continue
 
-                y_flip = torch.tensor([c], device=labels.device)
+                y_flip = torch.tensor([c], device=targets.device)
 
                 # Gradient for flipped label
                 grad_flip = self.compute_gradient(model, loss, x_i, y_flip)
 
-                # Cosine similarity (negative alignment can be used if needed)
                 dist = torch.nn.functional.cosine_similarity(
-                    grad_true, grad_flip, dim=0
+                    -grad_true, grad_flip, dim=0
                 )
 
-                # Pick the flip that maximizes harmful effect
-                if dist > max_dist:
-                    max_dist = dist
+                # Pick the flip that minimizes the cosine distance to the negative honest gradient
+                if dist < min_dist:
+                    min_dist = dist
                     best_label = y_flip
 
             flipped_labels[idx] = best_label
 
         return features, flipped_labels
+    
+    def compute_gradient(self, model,loss, x_i, label):
+            model.zero_grad()
+            predictions = model(x_i)
+            loss = loss(predictions, label)
+            loss.backward()
+            grad = [p.grad.detach().clone().flatten() for p in model.parameters() if p.grad is not None]
+            return torch.cat(grad)
+
+def get_num_classes(model):
+    if isinstance(model, CNNModel):
+        # For CNNModel, num_classes is determined by the out_features of the last fully connected layer
+        return model.fc2.out_features
+    elif isinstance(model, MLP):
+        # For MLP, num_classes is determined by the out_features of the classification layer
+        return model.classification_layer.out_features
+    elif isinstance(model, softmaxRegression_model):
+        # For softmax regression model, num_classes is determined by the out_features of the linear layer
+        return model.linear.out_features
+    else:
+        raise ValueError("Unknown model type. Cannot determine the number of classes.")
 
     
 ### Only works for non iid data (same class per worker)
@@ -596,7 +623,7 @@ class adversarial_omniscient_label_flipping(DataPoisoningAttack):
  
         # Calculate honest gradient
         label_true = labels.clone()
-        grad_true = self.compute_gradient(model, features, label_true)
+        grad_true = self.compute_gradient(model, loss, features, label_true)
 
         max_dist = -1
         best_flipped_label = label_true
@@ -612,7 +639,7 @@ class adversarial_omniscient_label_flipping(DataPoisoningAttack):
                 continue
 
             label_fake = torch.full_like(labels, y_flip)
-            grad_fake = self.compute_gradient(model, features, label_fake)
+            grad_fake = self.compute_gradient(model, loss, features, label_fake)
 
 
         #returns the label with the farthest gradient
