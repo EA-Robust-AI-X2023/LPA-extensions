@@ -7,7 +7,7 @@ from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_la
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CSGD_under_DPA_compute_bound, CMomentum_under_DPA_compute_hetero_bound
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
-from ByrdLab.library.learnRateController import ladder_lr, one_over_sqrt_k_lr
+from ByrdLab.library.learnRateController import cosineAnnealingLR, ladder_lr, one_over_sqrt_k_lr
 from ByrdLab.library.partition import (LabelSeperation, TrivalPartition,
                                    iidPartition, DirichletIiiPartition, DirichletMildPartition, DirichletNoniidPartition)
 from ByrdLab.library.tool import log
@@ -28,7 +28,8 @@ byzantine_nodes = [node for node in all_nodes if node not in honest_nodes]
 # args.graph = 'CompleteGraph'
 # args.attack = 'furthest_label_flipping'
 # args.attack = 'label_flipping'
-args.lr_ctrl = 'constant'
+# args.lr_ctrl = 'constant'
+args.lr_ctrl = 'cosine' #adapté pour resnet18
 # args.lr_ctrl = 'ladder'
 # args.data_partition = 'dirichlet_mild'
 # args.data_partition = 'noniid'
@@ -143,6 +144,10 @@ elif args.lr_ctrl == 'ladder':
     decreasing_iter_ls = [5000, 10000, 15000]
     proportion_ls = [0.3, 0.2, 0.1]
     lr_ctrl = ladder_lr(decreasing_iter_ls, proportion_ls)
+    
+elif args.lr_ctrl == 'cosine':
+    lr_ctrl = cosineAnnealingLR(total_iteration=200)
+
 else:
     assert False, 'unknown lr-ctrl'
 

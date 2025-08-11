@@ -74,4 +74,19 @@ class ladder_lr(learningRateController):
     def get_lr(self, iteration):
         pos = bisect.bisect_right(self.decreasing_iter_ls, iteration)
         return self.proportion_ls[pos - 1] * self.init_lr
+    
+class cosineAnnealingLR(learningRateController):
+    """
+    Conseillé pour resnet. init_lr est set dans les paramètres de la task MLP.
+    """
+    def __init__(self, total_iteration, eta_min=0.0):
+        super().__init__(name='cosineAnnealingLR')
+        self.total_iteration = total_iteration
+        self.eta_min = eta_min
+
+    def get_lr(self, iteration):
+        cos_inner = math.pi * iteration / self.total_iteration
+        lr = self.eta_min + (self.init_lr - self.eta_min) * (1 + math.cos(cos_inner)) / 2
+        return lr
+
         
