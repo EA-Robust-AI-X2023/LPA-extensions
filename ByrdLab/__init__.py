@@ -13,8 +13,6 @@ FEATURE_TYPE = torch.float64
 TARGET_TYPE = torch.int16
 VALUE_TYPE = torch.float64
 
-
-
 DEVICE = torch.device("cuda:" + str(gpu))
 # DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # DEVICE = torch.device("cpu")

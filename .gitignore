@@ -181,6 +181,6 @@ About
 dataset/*
 
 record/*
-!record/SR_mnist
+record/SR_mnist
 
 TODO.md
