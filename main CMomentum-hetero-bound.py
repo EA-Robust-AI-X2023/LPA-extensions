@@ -28,7 +28,8 @@ byzantine_nodes = [node for node in all_nodes if node not in honest_nodes]
 # args.graph = 'CompleteGraph'
 # args.attack = 'furthest_label_flipping'
 # args.attack = 'label_flipping'
-args.lr_ctrl = 'constant'
+#args.lr_ctrl = 'constant'
+args.lr_ctrl = '1/sqrt k'
 # args.lr_ctrl = 'ladder'
 # args.data_partition = 'dirichlet_mild'
 # args.data_partition = 'noniid'
@@ -45,14 +46,15 @@ args.lr_ctrl = 'constant'
 
 # dataset = ToySet(set_size=500, dimension=5, fix_seed=True)
 
-data_package = mnist()
-task = softmaxRegressionTask(data_package, batch_size=1000)
+# data_package = mnist()
+# task = softmaxRegressionTask(data_package, batch_size=1000)
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
 
-# data_package = cifar10()
-# task = NeuralNetworkTask(data_package, batch_size=1000)
+data_package = cifar10()
+task = NeuralNetworkTask(data_package, batch_size=1000)
+model_name = "ResNet18"
 
 # data_package = mnist()
 # task = NeuralNetworkTask(data_package, batch_size=1000)
@@ -228,9 +230,10 @@ if 'label' in attack_name:
            partition_cls=partition_cls, lr_ctrl=lr_ctrl,
            fix_seed=fix_seed, seed=seed,
            **task.super_params)
+    
 
 
-title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)
+title = '{}_{}_{}_{}'.format(env.name, model_name, attack_name, aggregation.name)
 
 if lr_ctrl != None:
     title = title + '_' + lr_ctrl.name

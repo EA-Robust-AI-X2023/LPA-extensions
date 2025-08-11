@@ -4,7 +4,7 @@ from functools import partial
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# from torchvision.models import ResNet18_Weights
+from torchvision.models import ResNet18_Weights
 from ByrdLab.library.RandomNumberGenerator import RngPackage
 from ByrdLab.library.dataset import DataPackage
 
@@ -136,10 +136,14 @@ class NeuralNetworkTask(Task):
         weight_decay = 0.0085
         # model = VGG('VGG11', data_package.num_classes)
         #model = CNNModel(data_package.num_classes)
-        model = MLP(data_package.num_classes)
+        
+        #model = MLP(data_package.num_classes)
 
-        # from torchvision.models import resnet18
-        # model = resnet18(weights=ResNet18_Weights.DEFAULT)
+        from torchvision.models import resnet18
+        model = resnet18(weights=ResNet18_Weights.DEFAULT)
+        num_features = model.fc.in_features
+        model.fc = torch.nn.Linear(num_features, data_package.num_classes)
+
         # model.conv1 = torch.nn.Conv2d(model.conv1.in_channels,
         #                         model.conv1.out_channels,
         #                         3, 1, 1)
@@ -151,12 +155,22 @@ class NeuralNetworkTask(Task):
         loss_fn = nn_loss
         test_fn = multi_classification_accuracy
 
+
+        # super_params = {
+        #     'rounds': 200,
+        #     'display_interval': 100,
+        #     'batch_size': batch_size,
+        #     'test_batch_size': 10000,
+        #     'lr': 1e-2,
+        #     'alpha':0.1,
+        # }
+        
         super_params = {
             'rounds': 200,
-            'display_interval': 100,
+            'display_interval': 1,
             'batch_size': batch_size,
             'test_batch_size': 10000,
-            'lr': 1e-2,
+            'lr': 1e-1/2,
             'alpha':0.1,
         }
 

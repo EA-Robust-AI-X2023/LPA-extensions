@@ -360,6 +360,9 @@ class furthest_label_flipping(DataPoisoningAttack):
         data_size = len(targets)
         for i in range(data_size):
             feature = features[i].clone().to(DEVICE)
+
+            if feature.dim() == 3: ##adaptation resnet
+                feature = feature.unsqueeze(0)
             # feature = feature.view(feature.size(0), -1).squeeze().clone()
             # distance = torch.mv(model.linear.weight.data, feature) + model.linear.bias.data
             distance = model(feature).squeeze()
@@ -392,8 +395,8 @@ class adversarial_label_flipping_linear(DataPoisoningAttack):
          This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*
          It only works for softmax regression !
         """
-        features = features.detach()
-        targets = targets.detach()
+        features = features.detach().to(DEVICE)
+        targets = targets.detach().to(DEVICE)
         model.eval()
 
         logits = model(features)              
@@ -408,7 +411,9 @@ class adversarial_label_flipping_linear(DataPoisoningAttack):
         
         W = last_linear.weight  
 
-        num_classes = W.shape[0]    
+        # num_classes = W.shape[0]
+        num_classes = get_num_classes(model)
+
 
         # Produit interne <x, Δ_j>
         inner_x_delta = features.view(features.size(0), -1) @ W.T     
@@ -425,100 +430,9 @@ class adversarial_label_flipping_linear(DataPoisoningAttack):
         return features, flipped_labels
 
     
-
-### On commente car ces attaques peuvent être réunies en une seule
-# class adversarial_anti_softmax_label_flipping(DataPoisoningAttack):
-#     def __init__(self):
-#         super().__init__(name='adversarial_label_optimal_gradient_flipping')      
-        
-#     def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
-#         """
-#         features: torch.Tensor [B, d]  -> batch features
-#         labels: torch.Tensor   [B]     -> true labels
-#         model: softmaxRegression_model
-#         This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*
-#         It only works for softmax regression !
-#         """
-#         features = features.detach()
-#         targets = targets.detach()
-#         model.eval()
-
-#         num_classes = model.linear.weight.shape[0]
-
-
-#         logits = model(features)              
-#         probs = torch.softmax(logits, dim=1)       
-
-#         W = model.linear.weight                
-
-#         # Compute <x_n, W_j> for all n,j
-#         inner_x_delta = features @ W.T        
-
-#         # compute Z matrix for all (n,c)
-#         I = torch.eye(num_classes, device=features.device).unsqueeze(0)  
-#         diff = I - probs.unsqueeze(1)                                    
-#         Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)          
-
-#         # Harmful label: argmax over C (vectorized)
-#         harmful_labels = torch.argmax(Z, dim=1)                      
-
-#         flipped_labels = torch.where(harmful_labels != targets, harmful_labels, targets)
-
-#         return features, flipped_labels
-
-    
-# class adversarial_last_layer_label_flipping(DataPoisoningAttack):
-#     def __init__(self):
-#         super().__init__(name='adversarial_label_optimal_gradient_flipping')      
-        
-#     def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
-#         """
-#         features: [B, d] features
-#         labels: [B] true labels
-#         model: classification model (assumed final layer linear for Z formula)
-        
-#         This attack performs label flipping as in *Approaching the Harm of Gradient Attacks While Only Flipping Labels*, but is 
-#         generalized to any model with a linear final layer,
-#         """
-#         features = features.detach()
-#         targets = targets.detach()
-#         model.eval()
-
-#         logits = model(features)               
-#         probs = torch.softmax(logits, dim=1)         
-
-#         # Extract final layer weights as Δ (for linear classifier)
-#         # Assumes model.fc or model.linear is final layer
-#         # Adjust if your model stores weights differently
-#         W = list(model.parameters())[-2]        
-#         Delta = W         
-
-#         num_classes = W.shape[0]                  
-
-#         # Compute <x, Δ_j> for all n, j
-#         inner_x_delta = features @ Delta.T       
-
-#         # Compute Z for all c, n
-#         # Z_c,n = sum_j ( I[c=j] - p_n[j] ) * <x_n, Δ_j>
-#         I = torch.eye(num_classes, device=features.device).unsqueeze(0)   
-#         diff = I - probs.unsqueeze(1)                                
-
-#         # Broadcast inner_x_delta into correct shape for summation
-#         Z = torch.einsum('bcj,bj->bc', diff, inner_x_delta)             
-
-#         # Choose harmful label per sample
-#         best_labels = targets.clone()
-#         for i in range(targets.size(0)):
-#             true_class = targets[i].item()
-#             harmful_class = torch.argmax(Z[i]).item()
-#             if harmful_class != true_class:
-#                 best_labels[i] = harmful_class
-
-#         return features, best_labels
-    
 class adversarial_omniscient_label_flipping_gradient(DataPoisoningAttack):
     def __init__(self):
-        super().__init__(name='adversarial_label_optimal_gradient_flipping')      
+        super().__init__(name='adversarial_omniscient_label_flipping_gradient')      
 
     def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage(), loss=None):
         """
@@ -532,8 +446,6 @@ class adversarial_omniscient_label_flipping_gradient(DataPoisoningAttack):
         It computes gradients directly
         """
 
-        
-    
         features = features.detach()
         targets = targets.detach()
         model.eval()
@@ -548,7 +460,7 @@ class adversarial_omniscient_label_flipping_gradient(DataPoisoningAttack):
             y_i = targets[idx:idx+1]      # True label (shape: [1])
 
             # Honest gradient for true label
-            grad_true = self.compute_gradient(model, loss, x_i, y_i)
+            grad_true = self.compute_gradient(model, loss, x_i.to(DEVICE), y_i.to(DEVICE))
 
             min_dist = float('inf')
             best_label = y_i.clone()
@@ -561,7 +473,7 @@ class adversarial_omniscient_label_flipping_gradient(DataPoisoningAttack):
                 y_flip = torch.tensor([c], device=targets.device)
 
                 # Gradient for flipped label
-                grad_flip = self.compute_gradient(model, loss, x_i, y_flip)
+                grad_flip = self.compute_gradient(model, loss, x_i.to(DEVICE), y_flip.to(DEVICE))
 
                 dist = torch.nn.functional.cosine_similarity(
                     -grad_true, grad_flip, dim=0
@@ -623,7 +535,7 @@ class adversarial_omniscient_label_flipping(DataPoisoningAttack):
  
         # Calculate honest gradient
         label_true = labels.clone()
-        grad_true = self.compute_gradient(model, loss, features, label_true)
+        grad_true = self.compute_gradient(model, loss, features.to(DEVICE), label_true.to(DEVICE))
 
         max_dist = -1
         best_flipped_label = label_true
@@ -639,7 +551,7 @@ class adversarial_omniscient_label_flipping(DataPoisoningAttack):
                 continue
 
             label_fake = torch.full_like(labels, y_flip)
-            grad_fake = self.compute_gradient(model, loss, features, label_fake)
+            grad_fake = self.compute_gradient(model, loss, features.to(DEVICE), label_fake.to(DEVICE))
 
 
         #returns the label with the farthest gradient

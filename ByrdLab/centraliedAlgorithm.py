@@ -744,7 +744,7 @@ class CMomentum_under_DPA_compute_hetero_bound(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    if "omniscient" in self.attack.name:
+                    if self.attack.name == 'adversarial_omniscient_label_flipping_gradient':
                         features, targets = self.attack.run(features, targets ,model=server_model, loss=self.loss_fn)
                     else:
                         features, targets = self.attack.run(features, targets, model=server_model)
