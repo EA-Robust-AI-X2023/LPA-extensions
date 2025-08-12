@@ -745,7 +745,10 @@ class CMomentum_under_DPA_compute_hetero_bound(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    features, targets = self.attack.run(features, targets, model=server_model)
+                    if "gradient_attack" in self.attack.name:
+                        features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model)
+                    else:
+                        features, targets = self.attack.run(features, targets, model=server_model)
 
                 features = features.to(DEVICE)
                 targets = targets.to(DEVICE)

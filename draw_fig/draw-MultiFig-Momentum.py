@@ -10,9 +10,9 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-# attack_name = 'label_flipping'
-# attack_name = 'furthest_label_flipping'
-attack_name = 'gradient_attack_label_flipping'
+attack_name = 'label_flipping'
+#attack_name = 'furthest_label_flipping'
+#attack_name = 'gradient_attack_label_flipping'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -115,16 +115,16 @@ def draw_mnist(task_name):
 
 
     aggregations = [
-        ('mean', 'Baseline'), 
-        # ('mean', 'Mean'), 
-        # ('trimmed_mean', 'TriMean'),
-        # ('faba', 'FABA'), 
+        # ('mean', 'Baseline'), 
+        ('mean', 'Mean'), 
+        ('trimmed_mean', 'TriMean'),
+        ('faba', 'FABA'), 
         # ('CC', 'CC'),
         # ('LFighter', 'LFighter'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        #('DirichletPartition_alpha=1', 'Mild Noniid'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 

@@ -118,7 +118,7 @@ def draw_mnist(task_name):
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        #('DirichletPartition_alpha=1', 'Mild Noniid'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
