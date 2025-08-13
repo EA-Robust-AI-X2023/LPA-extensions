@@ -13,6 +13,7 @@ graph_name = 'Centralized_n=10_b=1'
 attack_name = 'label_flipping'
 #attack_name = 'furthest_label_flipping'
 #attack_name = 'gradient_attack_label_flipping'
+attack_name = 'gradient_attack_label_flipping_omniscient_noniid'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -123,7 +124,7 @@ def draw_mnist(task_name):
         # ('LFighter', 'LFighter'),
     ]
     partition_names = [
-        ('iidPartition', 'IID'),
+        #('iidPartition', 'IID'),
         ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
