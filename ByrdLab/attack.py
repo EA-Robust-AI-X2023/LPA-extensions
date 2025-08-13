@@ -413,6 +413,8 @@ class gradient_attack_label_flipping(DataPoisoningAttack):
         
         grad_target = -model.linear.weight.grad  # [num_classes, num_features]
         
+        
+        ## Version lente, "torch-agnostic" commentée. version optimisée juste en dessous
         # #Pour chaque point de donnée du batch, on calcule le produit scalaire des features 
         # for n in range(len(features)):
         #     feature = features[n].clone().to(DEVICE)
