@@ -3,7 +3,7 @@ from argsParser import args
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
-                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random, gradient_attack_label_flipping
+                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random, gradient_attack_label_flipping, gradient_attack_label_flipping_omniscient_noniid
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA_compute_hetero_bound
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
@@ -46,7 +46,7 @@ args.lr_ctrl = 'constant'
 # dataset = ToySet(set_size=500, dimension=5, fix_seed=True)
 
 data_package = mnist()
-task = softmaxRegressionTask(data_package, batch_size=1000)
+task = softmaxRegressionTask(data_package, batch_size=1000) ##étrange d'être à 1000 ! il est à 32 dans les autres scripts...
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
@@ -120,6 +120,10 @@ elif args.attack == 'adversarial_label_flipping_noniid':
 
 elif args.attack == 'gradient_attack_label_flipping':
     attack = gradient_attack_label_flipping()
+    
+elif args.attack == 'gradient_attack_label_flipping_omniscient_noniid':
+    attack = gradient_attack_label_flipping_omniscient_noniid()
+
 
 if args.attack == 'none':
     attack_name = 'baseline'

@@ -358,6 +358,8 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
                     iteration / self.total_iterations * 100,
                     test_loss, test_accuracy, lr
                 ))
+                
+            batch_history= [] #stores history of batches/iter if the attack is omniscient
 
 
             # gradient descent
@@ -366,11 +368,19 @@ class CMomentum_under_DPA(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    if "gradient_attack" in self.attack.name:
+                    if self.attack.name == 'gradient_attack_label_flipping':
+                        print(self.attack.name)
                         features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model)
+                    elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                        #here, we get model+loss as in the previous one, but also the data points of honest batches
+                        #the honest batch list is full here, because luckily the byzantine nodes are the last in self.nodes !
+                        features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model, honest_data=batch_history)
+
                     else:
                         features, targets = self.attack.run(features, targets, model=server_model)
-
+                elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                    batch_history.append((features, targets))
+                    
                 features = features.to(DEVICE)
                 targets = targets.to(DEVICE)
                 predictions = server_model(features)
@@ -737,6 +747,9 @@ class CMomentum_under_DPA_compute_hetero_bound(Dist_Dataset_Opt_Env):
                     iteration / self.total_iterations * 100,
                     test_loss, test_accuracy, lr
                 ))
+                
+            batch_history= [] #stores history of batches/iter if the attack is omniscient
+
 
                 
             # gradient descent
@@ -745,11 +758,20 @@ class CMomentum_under_DPA_compute_hetero_bound(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    if "gradient_attack" in self.attack.name:
+                    if self.attack.name == 'gradient_attack_label_flipping':
+                        print(self.attack.name)
                         features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model)
+                    elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                        #here, we get model+loss as in the previous one, but also the data points of honest batches
+                        #the honest batch list is full here, because luckily the byzantine nodes are the last in self.nodes !
+                        features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model, honest_data=batch_history)
+
                     else:
                         features, targets = self.attack.run(features, targets, model=server_model)
-
+                elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                    batch_history.append((features, targets))
+                
+                
                 features = features.to(DEVICE)
                 targets = targets.to(DEVICE)
                 predictions = server_model(features)

@@ -2,7 +2,7 @@ from argsParser import args
 
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter
-from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
+from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, gradient_attack_label_flipping_omniscient_noniid, \
                             label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random, gradient_attack_label_flipping
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA, CMomentum_with_LFighter_under_DPA
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
@@ -119,6 +119,9 @@ elif args.attack == 'adversarial_label_flipping_noniid':
 
 elif args.attack == 'gradient_attack_label_flipping':
     attack = gradient_attack_label_flipping()
+
+elif args.attack == 'gradient_attack_label_flipping_omniscient_noniid':
+    attack = gradient_attack_label_flipping_omniscient_noniid()
 
 if args.attack == 'none':
     attack_name = 'baseline'

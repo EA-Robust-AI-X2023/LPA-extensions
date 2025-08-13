@@ -455,3 +455,74 @@ class gradient_attack_label_flipping(DataPoisoningAttack):
             
 
         return features, targets
+    
+class gradient_attack_label_flipping_omniscient_noniid(DataPoisoningAttack):
+        
+    def __init__(self):
+        super().__init__(name='gradient_attack_label_flipping_omniscient_noniid')
+
+    def run(self, features, targets, loss_fn, model, honest_data, rng_pack: RngPackage = RngPackage()):
+        """
+        Implements the gradient attack mimicking label flip from El Kahbid and El Mahdi
+        
+        Only works for logistic regression with cross entropy loss
+        
+        Requires model to be not none ! 
+        """
+        features = features.clone().to(DEVICE)
+        targets = targets.clone().to(DEVICE)
+        
+        assert model is not None, "Model cannot be None for gradient attack label flipping"
+        assert loss_fn is not None, "Loss function cannot be None for gradient attack label flipping"
+        assert honest_data is not None, "Honest data cannot be None for gradient attack label flipping omniscient noniid"
+
+        model.eval()
+
+        
+        
+        #On calcule le gradient honnête pour le batch
+         #!! ici on le fait pour le batch de tous les workers !
+
+
+        full_batch_features = torch.cat([data[0] for data in honest_data] + [features], dim=0)
+        full_batch_targets = torch.cat([data[1] for data in honest_data] + [targets], dim=0)
+        
+        probs_full_batch=model(full_batch_features)
+
+        loss = loss_fn(probs_full_batch, full_batch_targets)
+        model.zero_grad()
+        loss.backward()
+        
+        #On définit la cible: le contraire du gradient honnête
+        
+        grad_target = -model.linear.weight.grad  # [num_classes, num_features]
+        
+        #Maintenant que la cible est définie, on revient à notre modèle calculé sur le batch du noeud byzantin:
+        model.eval()
+        probs=model(features)
+        
+        num_classes = probs.size(1)
+
+        
+        flat_features = features.view(features.size(0), -1)  # [batch_size, num_features]
+        # grad_target: [num_classes, num_features]
+        # probs: [batch_size, num_classes]
+
+        # Compute (indic_c - probs) for all classes and all points
+        indic = torch.eye(num_classes, device=DEVICE)  # [num_classes, num_classes]
+        indic = indic.unsqueeze(0).expand(features.size(0), -1, -1)  # [batch_size, num_classes, num_classes]
+        probs_expanded = probs.unsqueeze(2)  # [batch_size, num_classes, 1]
+        diff = indic - probs_expanded  # [batch_size, num_classes, num_classes]
+
+        # Compute scalar products for all points and all classes
+        # grad_target: [num_classes, num_features]
+        neg_grad_target = -grad_target  # [num_classes, num_features]
+        scalar_products = torch.einsum('bnc,cf,bf->bn', diff, neg_grad_target, flat_features)
+        # scalar_products: [batch_size, num_classes]
+
+        # Find the class with minimum score for each point
+        _, c_star = torch.min(scalar_products, dim=1)
+        targets = c_star
+            
+
+        return features, targets
