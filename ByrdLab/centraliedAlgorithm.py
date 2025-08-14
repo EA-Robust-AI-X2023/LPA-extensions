@@ -971,6 +971,7 @@ class CMomentum_with_LFighter_under_DPA(Dist_Dataset_Opt_Env):
                     iteration / self.total_iterations * 100,
                     test_loss, test_accuracy, lr
                 ))
+            batch_history = [] #ici, on stocke les données des batches honnêtes
 
             # gradient descent
             for node in self.nodes:
@@ -980,8 +981,20 @@ class CMomentum_with_LFighter_under_DPA(Dist_Dataset_Opt_Env):
 
                 # data poisoning attack
                 if node in self.byzantine_nodes:
-                    features, targets = self.attack.run(features, targets, model=server_model)
+                    if self.attack.name == 'gradient_attack_label_flipping':
+                        print(self.attack.name)
+                        features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model)
+                    elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                        #here, we get model+loss as in the previous one, but also the data points of honest batches
+                        #the honest batch list is full here, because luckily the byzantine nodes are the last in self.nodes !
+                        features, targets = self.attack.run(features, targets, loss_fn=self.loss_fn, model=server_model, honest_data=batch_history)
 
+                    else:
+                        features, targets = self.attack.run(features, targets, model=server_model)
+                elif self.attack.name == 'gradient_attack_label_flipping_omniscient_noniid':
+                    batch_history.append((features, targets))
+                    
+                    
                 predictions = server_model(features)
                 loss = self.loss_fn(predictions, targets)
                 server_model.zero_grad()
