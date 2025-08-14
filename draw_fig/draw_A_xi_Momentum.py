@@ -160,11 +160,11 @@ def draw_mnist(task_name):
                     file_name = method + '_gradient_attack_label_flipping_mean' + suffix
                     file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
             elif label == 'Disturbance of gradient attack omniscient noniid label flipping':
-                    if partition_names[i][1] == 'Noniid':
+                    # if partition_names[i][1] == 'Noniid' or partition_names[i][1] == 'Mild Noniid':
                         file_name = method + '_gradient_attack_label_flipping_omniscient_noniid_mean' + suffix
                         file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
-                    else:
-                        continue #pour le moment, on a les données que pour le cas non iid
+                    # else:
+                    #     continue #pour le moment, on a les données que pour le cas non iid
             record = load_file_in_cache(file_name, path_list=file_path)
             x_axis = [r*interval for r in range(rounds+1)]
             axes[i].plot(x_axis, record, '-', color=color, marker=marker, label=label, markevery=20, linewidth=4, markersize=20)
