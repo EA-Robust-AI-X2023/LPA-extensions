@@ -3,7 +3,7 @@ from argsParser import args
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
-                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
+                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random, baseline
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA, CMomentum_with_LFighter_under_DPA
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
@@ -45,14 +45,14 @@ args.lr_ctrl = 'cosine' #adapté pour resnet18
 
 # dataset = ToySet(set_size=500, dimension=5, fix_seed=True)
 
-data_package = mnist()
-task = softmaxRegressionTask(data_package, batch_size=32)
+# data_package = mnist()
+# task = softmaxRegressionTask(data_package, batch_size=32)
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
 
-# data_package = cifar10()
-# task = NeuralNetworkTask(data_package, batch_size=32)
+data_package = cifar10()
+task = NeuralNetworkTask(data_package, batch_size=32)
 
 # data_package = mnist()
 # task = NeuralNetworkTask(data_package, batch_size=32)
@@ -121,6 +121,7 @@ elif args.attack == 'adversarial_label_flipping_noniid':
 if args.attack == 'none':
     attack_name = 'baseline'
     byzantine_size = 0
+    attack = baseline()
 
     honest_nodes = list(range(node_size))
     byzantine_nodes = []
@@ -254,6 +255,16 @@ if 'label' in attack_name:
               fix_seed=fix_seed, seed=seed,
               **task.super_params)
 
+else: 
+    env = CMomentum_under_DPA(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
+          weight_decay=task.weight_decay, data_package=task.data_package,
+          model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
+          initialize_fn=task.initialize_fn,
+          get_train_iter=task.get_train_iter,
+          get_test_iter=task.get_test_iter,
+          partition_cls=partition_cls, lr_ctrl=lr_ctrl,
+          fix_seed=fix_seed, seed=seed,
+          **task.super_params)
 
 title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)
 

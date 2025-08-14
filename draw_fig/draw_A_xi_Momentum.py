@@ -19,10 +19,13 @@ set_cache_path(__CACHE_PATH__)
 
 method = 'CMomentum'
 
+resnet = True
+lr_name= "cosineAnnealingLR" #Only for Resnet18
+
 
 def draw(task_name):
-    datasets = ['mnist', 'cifar10']
-
+    #datasets = ['mnist', 'cifar10']
+    datasets = ['cifar10']
     suffix_list = [
         ('_Bound_A', 'Disturbance of static label flipping'),
         ('_Bound_A', 'Disturbance of dynamic label flipping'),
@@ -58,8 +61,13 @@ def draw(task_name):
 
                 if label == 'Heterogeneity':
                     file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
-                    file_name_1 = method + '_label_flipping_mean' + suffix
-                    file_name_2 = method + '_furthest_label_flipping_mean' + suffix
+                    
+                    if resnet:
+                        file_name_1 = method + '_label_flipping_mean' +'_' + lr_name+ suffix
+                        file_name_2 = method + '_furthest_label_flipping_mean' +'_' + lr_name+ suffix
+                    else:
+                        file_name_1 = method + '_label_flipping_mean' + suffix
+                        file_name_2 = method + '_furthest_label_flipping_mean' + suffix
                     record_1 = load_file_in_cache(file_name_1, path_list=file_path)
                     record_2 = load_file_in_cache(file_name_2, path_list=file_path)
                     if max(record_1) >= max(record_2):
@@ -67,10 +75,16 @@ def draw(task_name):
                     else:
                         file_name = file_name_2
                 elif label == 'Disturbance of static label flipping':
-                    file_name = method + '_label_flipping_mean' + suffix
+                    if resnet:
+                        file_name= method + '_label_flipping_mean'+'_' + lr_name + suffix
+                    else:
+                        file_name = method + '_label_flipping_mean' + suffix
                     file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
                 elif label == 'Disturbance of dynamic label flipping':
-                    file_name = method + '_furthest_label_flipping_mean' + suffix
+                    if resnet:
+                        file_name= method + '_furthest_label_flipping_mean'+'_' + lr_name + suffix
+                    else:
+                        file_name = method + '_furthest_label_flipping_mean' + suffix
                     file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
                 record = load_file_in_cache(file_name, path_list=file_path)
                 x_axis = [r*interval for r in range(rounds+1)]
@@ -113,8 +127,8 @@ def draw_mnist(task_name):
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
-        ('LabelSeperation', 'Noniid')
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('LabelSeperation', 'Noniid')
     ]
 
     pic_name = task_name + '_' + dataset + '_' + method + '_A_hetero'
@@ -181,5 +195,5 @@ def draw_mnist(task_name):
 
 
 if __name__ == '__main__':
-    draw_mnist('SR')
+    #draw_mnist('SR')
     draw('NeuralNetwork')

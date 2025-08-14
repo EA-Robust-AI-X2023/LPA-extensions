@@ -2,9 +2,9 @@ from argsParser import args
 
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping
-from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
+from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, baseline, feature_label_random, \
                             label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
-from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CSGD_under_DPA_compute_bound, CMomentum_under_DPA_compute_hetero_bound
+from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA_compute_hetero_bound
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
 from ByrdLab.library.learnRateController import cosineAnnealingLR, ladder_lr, one_over_sqrt_k_lr
@@ -52,11 +52,11 @@ args.lr_ctrl = 'cosine' #adapté pour resnet18
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
 
-# data_package = cifar10()
-# task = NeuralNetworkTask(data_package, batch_size=1000)
-
-data_package = mnist()
+data_package = cifar10()
 task = NeuralNetworkTask(data_package, batch_size=1000)
+
+# data_package = mnist()
+# task = NeuralNetworkTask(data_package, batch_size=1000)
 
 # w_star = torch.tensor([1], dtype=FEATURE_TYPE)
 # data_package = LeastSquareToySet(set_size=2000, dimension=1, w_star=w_star, noise=0, fix_seed=True)
@@ -122,6 +122,7 @@ elif args.attack == 'adversarial_label_flipping_noniid':
 if args.attack == 'none':
     attack_name = 'baseline'
     byzantine_size = 0
+    attack = baseline()
 
     honest_nodes = list(range(node_size))
     byzantine_nodes = []
@@ -218,8 +219,8 @@ record_in_file = not args.without_record
 step_agg = args.step_agg
 
 # initilize optimizer
-if 'label' in attack_name:
-    env = CMomentum_under_DPA_compute_hetero_bound(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
+# if 'label' in attack_name:
+env = CMomentum_under_DPA_compute_hetero_bound(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
            weight_decay=task.weight_decay, data_package=task.data_package,
            model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
            initialize_fn=task.initialize_fn,
@@ -228,6 +229,7 @@ if 'label' in attack_name:
            partition_cls=partition_cls, lr_ctrl=lr_ctrl,
            fix_seed=fix_seed, seed=seed,
            **task.super_params)
+
 
 
 title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)

@@ -10,9 +10,12 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-# attack_name = 'label_flipping'
-attack_name = 'furthest_label_flipping'
+attack_name = 'label_flipping'
+#attack_name = 'furthest_label_flipping'
 method = 'CMomentum'
+
+resnet = True
+lr_name= "cosineAnnealingLR" #Only for Resnet18
 
 FONTSIZE = 50
 
@@ -22,15 +25,15 @@ __CACHE_PATH__ = os.path.join(__FILE_DIR__, os.path.pardir, __CACHE_DIR__)
 set_cache_path(__CACHE_PATH__)
 
 def draw(task_name):
-    datasets = ['mnist', 'cifar10']
-    # datasets = ['cifar10']
+    #datasets = ['mnist', 'cifar10']
+    datasets = ['cifar10']
     aggregations = [
         ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
-        ('faba', 'FABA'), 
-        ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
+        # ('trimmed_mean', 'TriMean'),
+        # ('faba', 'FABA'), 
+        # ('CC', 'CC'),
+        # ('LFighter', 'LFighter'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
@@ -44,7 +47,7 @@ def draw(task_name):
 
     axes[0][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
     axes[1][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
-    axes[0][0].set_ylim(0.4, 0.98)
+    axes[0][0].set_ylim(0, 0.98)
 
     
 
@@ -66,9 +69,14 @@ def draw(task_name):
                 if agg_show_name == 'Baseline':
                     file_name = method + '_baseline_mean'
                     file_path = [taskname, 'Centralized_n=10_b=0', partition_names[i][0]]
+                    
+                    if resnet:
+                        file_name+='_' + lr_name
                 else:
                     file_name = method + '_' + attack_name + '_' + agg_code_name + ''
                     file_path = [taskname, graph_name, partition_names[i][0]]
+                    if resnet:
+                        file_name+='_' + lr_name
 
                 record = load_file_in_cache(file_name, path_list=file_path)
                 acc_path = record['acc_path']
@@ -186,4 +194,4 @@ def draw_mnist(task_name):
 
 if __name__ == '__main__':
     draw('NeuralNetwork')
-    draw_mnist('SR')
+    #draw_mnist('SR')

@@ -3,6 +3,7 @@ import random
 
 import scipy.stats
 import torch
+import torchvision
 
 from ByrdLab import FEATURE_TYPE, DEVICE
 from ByrdLab.library.RandomNumberGenerator import RngPackage
@@ -360,6 +361,8 @@ class furthest_label_flipping(DataPoisoningAttack):
             feature = features[i].clone().to(DEVICE)
             # feature = feature.view(feature.size(0), -1).squeeze().clone()
             # distance = torch.mv(model.linear.weight.data, feature) + model.linear.bias.data
+            if isinstance(model, torchvision.models.ResNet):
+                feature = feature.unsqueeze(0) #on ajoute une dimension pour la batch
             distance = model(feature).squeeze()
             _, prediction_cls = torch.min(distance, dim=0)
             targets[i] = prediction_cls
@@ -372,6 +375,16 @@ class adversarial_label_flipping(DataPoisoningAttack):
         super().__init__(name='adversarial_label_flipping')
 
     def run(self, features, targets, model= None, rng_pack: RngPackage = RngPackage()):
+        features = features
+        targets = targets
+        return features, targets
+    
+class baseline(DataPoisoningAttack):
+
+    def __init__(self):
+        super().__init__(name='baseline')
+
+    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
         features = features
         targets = targets
         return features, targets
