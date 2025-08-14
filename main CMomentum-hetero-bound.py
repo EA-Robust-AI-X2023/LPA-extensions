@@ -1,7 +1,7 @@
 from argsParser import args
 
 from ByrdLab import FEATURE_TYPE
-from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping
+from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_Krum, C_mKrum
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
                             label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CSGD_under_DPA_compute_bound, CMomentum_under_DPA_compute_hetero_bound
@@ -184,10 +184,10 @@ elif args.aggregation == 'faba':
     aggregation = C_faba(honest_nodes, byzantine_nodes)
 # elif args.aggregation == 'remove-outliers':
 #     aggregation = D_remove_outliers(graph)
-# elif args.aggregation == 'mKrum':
-#     aggregation = D_mKrum(graph)
-# elif args.aggregation == 'Krum':
-#     aggregation = D_Krum(graph)
+elif args.aggregation == 'mKrum':
+    aggregation = C_mKrum(honest_nodes, byzantine_nodes)
+elif args.aggregation == 'Krum':
+    aggregation = C_Krum(honest_nodes, byzantine_nodes)
 # elif args.aggregation == 'bulyan':
 #     aggregation = D_bulyan(graph)
 # elif args.aggregation == 'brute':
