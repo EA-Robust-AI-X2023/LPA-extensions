@@ -244,7 +244,7 @@ class C_mean(CentraliedAggregation):
 
     def run(self, messages):
         return torch.mean(messages, dim=0)
-
+    
 
 class C_trimmed_mean(CentraliedAggregation):
     def __init__(self, honest_nodes, byzantine_nodes):
@@ -368,6 +368,22 @@ class C_LFighter(CentraliedAggregation):
                 mean[i].add_(g, alpha=1 / len(remain_worker_grad))
 
         return mean
+    
+
+class C_Krum(CentraliedAggregation):
+    def __init__(self, honest_nodes, byzantine_nodes):
+        super().__init__(name='Krum', honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes)
+
+    def run(self, messages):
+        return Krum(wList = messages, byzantine_size = len(self.byzantine_nodes))
+        
+    
+class C_mKrum(CentraliedAggregation):
+    def __init__(self, honest_nodes, byzantine_nodes):
+        super().__init__(name='mKrum', honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes)
+
+    def run(self, messages):
+        return mKrum(wList = messages, byzantine_size = len(self.byzantine_nodes), m = 1)
 
 
 class DecentralizedAggregation():
