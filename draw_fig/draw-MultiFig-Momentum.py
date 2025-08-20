@@ -26,15 +26,16 @@ def draw(task_name):
     # datasets = ['cifar10']
     aggregations = [
         ('mean', 'Baseline'), 
-        ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
-        ('faba', 'FABA'), 
-        ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
+        ('Krum', 'krum')
+        #('mean', 'Mean'), 
+        #('trimmed_mean', 'TriMean'),
+        #('faba', 'FABA'), 
+        #('CC', 'CC'),
+        #('LFighter', 'LFighter'),
     ]
     partition_names = [
-        ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('iidPartition', 'IID'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -113,16 +114,17 @@ def draw_mnist(task_name):
 
 
     aggregations = [
-        ('mean', 'Baseline'), 
-        ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
-        ('faba', 'FABA'), 
-        ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
+        ('mean', 'Baseline'),
+        ('Krum', 'Krum') 
+        #('mean', 'Mean'), 
+        #('trimmed_mean', 'TriMean'),
+        #('faba', 'FABA'), 
+        #('CC', 'CC'),
+        #('LFighter', 'LFighter'),
     ]
     partition_names = [
-        ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        #('iidPartition', 'IID'),
+        #('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
