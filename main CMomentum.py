@@ -227,30 +227,30 @@ step_agg = args.step_agg
 # alpha = task.super_params['alpha']
 
 # initilize optimizer
-if 'label' in attack_name:
-    if args.aggregation == 'lfighter':
-        env = CMomentum_with_LFighter_under_DPA(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
-               weight_decay=task.weight_decay, data_package=task.data_package,
-               model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
-               initialize_fn=task.initialize_fn,
-               get_train_iter=task.get_train_iter,
-               get_test_iter=task.get_test_iter,
-               partition_cls=partition_cls, lr_ctrl=lr_ctrl,
-               fix_seed=fix_seed, seed=seed,
-               **task.super_params)
-    else:
-        env = CMomentum_under_DPA(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
-              weight_decay=task.weight_decay, data_package=task.data_package,
-              model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
-              initialize_fn=task.initialize_fn,
-              get_train_iter=task.get_train_iter,
-              get_test_iter=task.get_test_iter,
-              partition_cls=partition_cls, lr_ctrl=lr_ctrl,
-              fix_seed=fix_seed, seed=seed,
-              **task.super_params)
-
+# if 'label' in attack_name:
+if args.aggregation == 'lfighter':
+    env = CMomentum_with_LFighter_under_DPA(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
+            weight_decay=task.weight_decay, data_package=task.data_package,
+            model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
+            initialize_fn=task.initialize_fn,
+            get_train_iter=task.get_train_iter,
+            get_test_iter=task.get_test_iter,
+            partition_cls=partition_cls, lr_ctrl=lr_ctrl,
+            fix_seed=fix_seed, seed=seed,
+            **task.super_params)
+else:
+    env = CMomentum_under_DPA(aggregation=aggregation, honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes, attack=attack, step_agg = step_agg,
+            weight_decay=task.weight_decay, data_package=task.data_package,
+            model=task.model, loss_fn=task.loss_fn, test_fn=task.test_fn,
+            initialize_fn=task.initialize_fn,
+            get_train_iter=task.get_train_iter,
+            get_test_iter=task.get_test_iter,
+            partition_cls=partition_cls, lr_ctrl=lr_ctrl,
+            fix_seed=fix_seed, seed=seed,
+            **task.super_params)
 
 title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)
+
 
 if lr_ctrl != None:
     title = title + '_' + lr_ctrl.name
