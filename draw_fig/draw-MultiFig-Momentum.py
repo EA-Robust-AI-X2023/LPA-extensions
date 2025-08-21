@@ -41,7 +41,7 @@ def draw(task_name):
 
     pic_name = 'centralized_' + task_name + '_' + graph_name + '_' + method + '_' + attack_name
 
-    fig, axes = plt.subplots(2, len(partition_names), figsize=(26, 19), sharex=True, sharey='row', squeeze=False)
+    fig, axes = plt.subplots(2, len(partition_names), figsize=(26, 19), sharex=True, sharey='row')
 
     axes[0][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
     axes[1][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
@@ -130,9 +130,7 @@ def draw_mnist(task_name):
 
     pic_name = 'centralized_' + task_name + '_' + dataset + '_' + graph_name + '_' + method + '_' + attack_name
 
-    fig, axes = plt.subplots(1, len(partition_names), figsize=(26, 11), sharex=True, sharey=True, squeeze=False)
-    axes[0][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
-    axes[1][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
+    fig, axes = plt.subplots(1, len(partition_names), figsize=(26, 11), sharex=True, sharey=True)
 
 
     taskname = task_name + '_' + dataset
