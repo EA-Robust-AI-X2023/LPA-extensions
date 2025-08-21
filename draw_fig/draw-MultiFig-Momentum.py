@@ -131,6 +131,8 @@ def draw_mnist(task_name):
     pic_name = 'centralized_' + task_name + '_' + dataset + '_' + graph_name + '_' + method + '_' + attack_name
 
     fig, axes = plt.subplots(1, len(partition_names), figsize=(26, 11), sharex=True, sharey=True)
+    axes[0].set_ylabel('Accuracy', fontsize=FONTSIZE)
+    axes[0].set_ylim(0.6, 0.93)
 
 
     taskname = task_name + '_' + dataset
@@ -139,7 +141,14 @@ def draw_mnist(task_name):
         axes[i].set_xlabel('iterations', fontsize=FONTSIZE)
         axes[i].tick_params(labelsize=FONTSIZE)
         axes[i].grid('on')
+                
         for agg_index, (agg_code_name, agg_show_name) in enumerate(aggregations):
+            
+            #pour CC, on a calculé que pour la distrib Noniid...
+            if agg_code_name == "CC":
+                if partition_names[i][1] != 'Noniid':
+                    continue
+            
             color = colors[agg_index]
             marker = markers[agg_index]
             if partition_names[i][0] == 'iidPartition' and agg_code_name == 'CC':
