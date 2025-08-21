@@ -4,6 +4,9 @@ from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter, C_Krum, C_mKrum
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
                             label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
+from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter
+from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
+                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA, CMomentum_with_LFighter_under_DPA
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
@@ -249,8 +252,8 @@ else:
             fix_seed=fix_seed, seed=seed,
             **task.super_params)
 
-title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)
 
+title = '{}_{}_{}'.format(env.name, attack_name, aggregation.name)
 
 if lr_ctrl != None:
     title = title + '_' + lr_ctrl.name
@@ -306,4 +309,5 @@ if record_in_file:
     path_list = [task.name, f'Centralized_n={node_size}_b={byzantine_size}', env.partition_name] + workspace
     dump_file_in_cache(title, record, path_list=path_list)
 print('-------------------------------------------')
+
 

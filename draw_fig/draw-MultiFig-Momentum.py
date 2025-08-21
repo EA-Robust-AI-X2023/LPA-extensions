@@ -10,8 +10,10 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-# attack_name = 'label_flipping'
-attack_name = 'none'
+attack_name = 'label_flipping'
+#attack_name = 'furthest_label_flipping'
+#attack_name = 'gradient_attack_label_flipping'
+attack_name = 'gradient_attack_label_flipping_omniscient_noniid'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -22,20 +24,20 @@ __CACHE_PATH__ = os.path.join(__FILE_DIR__, os.path.pardir, __CACHE_DIR__)
 set_cache_path(__CACHE_PATH__)
 
 def draw(task_name):
-    datasets = ['mnist', 'cifar10']
+    #datasets = ['mnist', 'cifar10']
     # datasets = ['cifar10']
+    datasets = ['mnist']
     aggregations = [
         ('mean', 'Baseline'), 
-        ('Krum', 'krum')
-        #('mean', 'Mean'), 
-        #('trimmed_mean', 'TriMean'),
-        #('faba', 'FABA'), 
-        #('CC', 'CC'),
-        #('LFighter', 'LFighter'),
+        # ('mean', 'Mean'), 
+        # ('trimmed_mean', 'TriMean'),
+        # ('faba', 'FABA'), 
+        # ('CC', 'CC'),
+        # ('LFighter', 'LFighter'),
     ]
     partition_names = [
-        #('iidPartition', 'IID'),
-        #('DirichletPartition_alpha=1', 'Mild Noniid'),
+        ('iidPartition', 'IID'),
+        # ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -114,17 +116,17 @@ def draw_mnist(task_name):
 
 
     aggregations = [
-        #('mean', 'Baseline'),
-        ('Krum', 'Krum'), 
+        # ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
-        #('trimmed_mean', 'TriMean'),
-        #('faba', 'FABA'), 
-        #('CC', 'CC'),
-        #('LFighter', 'LFighter'),
+        ('trimmed_mean', 'TriMean'),
+        ('faba', 'FABA'), 
+        ('CC', 'CC'),
+        ("Krum", "Krum"),
+        # ('LFighter', 'LFighter'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        #('DirichletPartition_alpha=1', 'Mild Noniid'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -194,5 +196,5 @@ def draw_mnist(task_name):
     plt.show()
 
 if __name__ == '__main__':
-    # draw('NeuralNetwork')
+    #draw('NeuralNetwork')
     draw_mnist('SR')
