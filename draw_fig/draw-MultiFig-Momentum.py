@@ -115,7 +115,7 @@ def draw_mnist(task_name):
 
     aggregations = [
         #('mean', 'Baseline'),
-        ('Krum', 'Krum') 
+        ('Krum', 'Krum'), 
         ('mean', 'Mean'), 
         #('trimmed_mean', 'TriMean'),
         #('faba', 'FABA'), 
