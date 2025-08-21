@@ -187,5 +187,5 @@ def draw_mnist(task_name):
     plt.show()
 
 if __name__ == '__main__':
-    draw('NeuralNetwork')
+    # draw('NeuralNetwork')
     draw_mnist('SR')
