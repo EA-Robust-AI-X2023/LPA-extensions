@@ -11,7 +11,7 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
 # attack_name = 'label_flipping'
-attack_name = 'furthest_label_flipping'
+attack_name = 'none'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -187,5 +187,5 @@ def draw_mnist(task_name):
     plt.show()
 
 if __name__ == '__main__':
-    #draw('NeuralNetwork')
+    draw('NeuralNetwork')
     draw_mnist('SR')
