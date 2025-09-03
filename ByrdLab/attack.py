@@ -330,6 +330,7 @@ class label_flipping(DataPoisoningAttack):
         #         targets[i] = 3 
         return features, targets
     
+
 class label_random(DataPoisoningAttack):
 
     def __init__(self):
@@ -340,6 +341,7 @@ class label_random(DataPoisoningAttack):
         targets = torch.randint(0, 9, size=targets.shape, generator=rng_pack.torch)
         return features, targets
     
+
 class feature_label_random(DataPoisoningAttack):
 
     def __init__(self):
@@ -349,7 +351,8 @@ class feature_label_random(DataPoisoningAttack):
         features = 2 * torch.rand(size=features.shape, generator=rng_pack.torch, dtype=FEATURE_TYPE) - 1
         targets = torch.randint(0, 9, size=targets.shape, generator=rng_pack.torch)
         return features, targets
-    
+
+
 class furthest_label_flipping(DataPoisoningAttack):
 
     def __init__(self):
@@ -379,6 +382,7 @@ class adversarial_label_flipping(DataPoisoningAttack):
         targets = targets
         return features, targets
     
+
 class baseline(DataPoisoningAttack):
 
     def __init__(self):
@@ -388,3 +392,55 @@ class baseline(DataPoisoningAttack):
         features = features
         targets = targets
         return features, targets
+
+
+class LFighter_attack(DataPoisoningAttack):
+    """
+    Implementation of the label flipping attack used to demonstrate LFighter efficiency in heterogenous setup
+    """
+
+    def __init__(self):
+        super().__init__(name='LFighter attack')
+    
+    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
+        # Flip only cat -> dog on CIFAR 10
+        poisoned_targets = targets.copy()
+        poisoned_targets[poisoned_targets == 3] = 5
+        return features, poisoned_targets
+    
+
+class Gradient_attack(DataPoisoningAttack):
+    """
+    Implementation of the Gradient attack
+    """
+
+    def __init__(self):
+        super().__init__(name = 'Gradient Attack')
+
+    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
+
+        poisoned_targets = []
+        K = len(set(targets))
+        data_dim = features.dim()
+        data_size = len(features)
+        model = model.to(DEVICE)
+        parameters = torch.cat([p.view(-1) for p in model.parameters()])
+
+        for i in range(data_size):
+            X = []
+            feature = features[i].clone().to(DEVICE)
+            feature = feature.view(-1)
+            for k in range(K):
+                dot_product = torch.dot(feature, parameters[k*data_dim : (k+1)*data_dim])
+                X += [torch.exp(dot_product)]
+            tensor_vec = torch.stack(X)
+            tensor_vec = tensor_vec / tensor_vec.sum()
+            _, indices = torch.topk(tensor_vec, k=2)
+            if targets[i] == indices[0]:
+                poisoned_targets[i] = indices[1]
+            else:
+                poisoned_targets[i] = indices[0]
+
+        return features, poisoned_targets
+
+
