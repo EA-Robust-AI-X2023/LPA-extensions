@@ -122,6 +122,8 @@ def draw_mnist(task_name):
         ('faba', 'FABA'), 
         ('CC', 'CC'),
         # ('LFighter', 'LFighter'),
+        ('Krum', 'Krum'),
+        ('mKrum', 'mKrum'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
@@ -133,7 +135,7 @@ def draw_mnist(task_name):
 
     fig, axes = plt.subplots(1, len(partition_names), figsize=(26, 11), sharex=True, sharey=True)
     axes[0].set_ylabel('Accuracy', fontsize=FONTSIZE)
-    axes[0].set_ylim(0.6, 0.93)
+    axes[0].set_ylim(0.2, 0.93)
 
 
     taskname = task_name + '_' + dataset
@@ -149,7 +151,10 @@ def draw_mnist(task_name):
             if agg_code_name == "CC":
                 if partition_names[i][1] != 'Noniid':
                     continue
-            
+            # if agg_code_name == 'Krum' or agg_code_name == 'mKrum':
+            #     if partition_names[i][1] != 'Noniid':
+            #         continue
+
             color = colors[agg_index]
             marker = markers[agg_index]
             if partition_names[i][0] == 'iidPartition' and agg_code_name == 'CC':

@@ -129,7 +129,7 @@ def draw_mnist(task_name):
 
     fig, axes = plt.subplots(1, len(partition_names), figsize=(21, 11), sharex=True, sharey=True)
     axes[0].set_ylabel('Accuracy', fontsize=FONTSIZE)
-    axes[0].set_ylim(0.7, 0.93)
+    axes[0].set_ylim(0.2, 0.93)
 
 
     taskname = task_name + '_' + dataset
