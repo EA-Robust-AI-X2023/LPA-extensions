@@ -20,8 +20,8 @@ from ByrdLab.tasks.softmaxRegression import softmaxRegressionTask
 from ByrdLab.tasks.leastSquare import LeastSquareToySet, LeastSquareToyTask
 from ByrdLab.tasks.neuralNetwork import NeuralNetworkTask
 
-node_size = 10
-byzantine_size = 1
+node_size = 100
+byzantine_size = 10
 
 all_nodes = list(range(node_size))
 honest_nodes = list(range(node_size - byzantine_size))
@@ -49,6 +49,7 @@ args.lr_ctrl = 'constant'
 
 data_package = mnist()
 task = softmaxRegressionTask(data_package, batch_size=32)
+task.super_params['display_interval'] = 15
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
