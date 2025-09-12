@@ -1,0 +1,27 @@
+Petit guide pour plotter avec des nouvelles attaques :
+
+
+2 scripts pythons permettent de run les entraînements qui nous intéressent:
+- Cmomentum pour record juste les données de base d'entraînements
+- CMomentum hetero bound pour calculer A et ksi (nécessaire pour les plotter)
+
+C'est un peu bête, mais les plots d'accuracy du papier peuvent uniquement être plottés avec l'output de Cmomentum dans record
+
+
+Ensuite, pour afficher les graphes:
+- draw_Multifig _Momentum pour plotter les accuracy selon la distribution et les attaques. 
+- draw-A-xi_Momentum pour plot les bornes
+
+Dans chaque cas, il faut utiliser soit la fonction draw (pour CIFAR ou tout autre dataset), et draw_mnist si c'est sur MNISt (ce qui est un aberrrant qu'on se le dise)
+
+Ensuite, pour multifig:
+- commenter dans la fonction les aggrégations et les distributions que tu n'as pas calculées. Il me semble qu'il faut au moins 2 distributions pour que ca marche. 
+Dans cette branche, j'ai ajouté une exception pour une aggrégation dont je n'ai pas calculé la distrib non iid.
+
+
+Pour A_xi:
+- commenter /ajouter des lignes dans la suffix list selon les attaques que tu inclue. Idem pour les partitions
+- ajouter un elif dans la suite du script pour ton attaque. Typiquement:
+    elif label == 'Disturbance of gradient attack label flipping':
+                    file_name = method + '_gradient_attack_label_flipping_mean' + suffix
+                    file_path = [taskname, 'Centralized_n=10_b=1', partition_names[i][0]]
