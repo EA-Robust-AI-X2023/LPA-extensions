@@ -3,7 +3,7 @@ from argsParser import args
 from ByrdLab import FEATURE_TYPE
 from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
-                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
+                            label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random, Gradient_attack
 from ByrdLab.centraliedAlgorithm import CMomentum_under_DPA_compute_variance
 from ByrdLab.library.cache_io import dump_file_in_cache, load_file_in_cache
 from ByrdLab.library.dataset import ijcnn, mnist, fashionmnist, cifar10, mnist_sorted_by_labels
@@ -117,6 +117,9 @@ elif args.attack == 'adversarial_label_flipping_noniid':
             k = i // flipped_data_size
             index = i % flipped_data_size
             task.data_package.train_set.targets[index] = (task.data_package.train_set.targets[index] + k) % num_classes
+
+elif args.attack == 'Gradient attack':
+    attack = Gradient_attack()
 
 if args.attack == 'none':
     attack_name = 'baseline'
