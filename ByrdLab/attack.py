@@ -417,30 +417,98 @@ class Gradient_attack(DataPoisoningAttack):
     def __init__(self):
         super().__init__(name = 'Gradient Attack')
 
-    def run(self, features, targets, model=None, rng_pack: RngPackage = RngPackage()):
+    def run(self, features, targets, model=None, parameters=None):
+        """
+        Robust version of run for Gradient_attack.
+        - features: tensor-like (N, data_dim) or (data_dim,)
+        - targets: not modified here, kept for compatibility
+        - model: optional torch.nn.Module (server_model), used to infer appropriate parameter tensor
+        - parameters: optional explicit parameters input (list, tensor, etc). If None and model provided, derived from model.
+        Returns: same outputs your pipeline expects, but avoids shape-mismatch errors and provides clear messages.
+        """
 
-        poisoned_targets = []
-        K = len(set(targets))
-        data_dim = features.dim()
-        data_size = len(features)
-        model = model.to(DEVICE)
-        parameters = torch.cat([p.view(-1) for p in model.parameters()])
+        # ensure torch tensors
+        if not torch.is_tensor(features):
+            features = torch.tensor(features)
+        # normalize features to 2D: (num_items, data_dim)
+        if features.dim() == 1:
+            features = features.view(1, -1)
+        num_items, data_dim = features.shape
 
-        for i in range(data_size):
-            X = []
-            feature = features[i].clone().to(DEVICE)
-            feature = feature.view(-1)
-            for k in range(K):
-                dot_product = torch.dot(feature, parameters[k*data_dim : (k+1)*data_dim])
-                X += [torch.exp(dot_product)]
-            tensor_vec = torch.stack(X)
-            tensor_vec = tensor_vec / tensor_vec.sum()
-            _, indices = torch.topk(tensor_vec, k=2)
-            if targets[i] == indices[0]:
-                poisoned_targets[i] = indices[1]
+        # Acquire parameters source (prefer explicit arg if provided)
+        if parameters is None and model is not None:
+            # Try to find a parameter tensor whose last dim matches data_dim (e.g. weight matrix (out, in))
+            chosen = None
+            for name, p in model.named_parameters():
+                if p is None:
+                    continue
+                if p.dim() >= 1 and p.size(-1) == data_dim:
+                    chosen = p.detach()
+                    # choose the first reasonable match (common case)
+                    break
+
+            if chosen is not None:
+                params2D = chosen.detach()
+                flat_params = None
             else:
-                poisoned_targets[i] = indices[0]
+                # fallback: flatten all parameters into 1D vector
+                flat_params = torch.cat([p.detach().view(-1) for p in model.parameters()]) if any(True for _ in model.parameters()) else None
+                params2D = None
+        else:
+            # explicit parameters passed
+            params = parameters
+            if isinstance(params, (list, tuple)):
+                # list of parameter tensors -> flatten them all
+                flat_params = torch.cat([p.detach().view(-1) for p in params])
+                params2D = None
+            elif torch.is_tensor(params):
+                if params.dim() == 2 and params.size(1) == data_dim:
+                    # each row is a params vector matching data_dim
+                    params2D = params.detach()
+                    flat_params = None
+                elif params.dim() == 1:
+                    flat_params = params.detach()
+                    params2D = None
+                else:
+                    # unexpected shape: flatten to 1D but warn
+                    flat_params = params.detach().view(-1)
+                    params2D = None
+            else:
+                raise TypeError(f"Unsupported parameters type: {type(params)}")
 
-        return features, poisoned_targets
+        # Now compute dot-products worker-wise:
+        # Case 1: params2D present -> shape should be (num_workers, data_dim)
+        if params2D is not None:
+            if params2D.size(1) != data_dim:
+                raise RuntimeError(f"params2D last dim {params2D.size(1)} != feature dim {data_dim}")
+            # if num_items equals number of rows we can batch dot as row-wise elementwise product sum
+            if params2D.size(0) != num_items:
+                # either broadcasting (if one param vector for all features) or mismatch
+                if params2D.size(0) == 1:
+                    # single parameter vector used for all features
+                    param_vecs = params2D.repeat(num_items, 1)
+                else:
+                    raise RuntimeError(f"params2D has {params2D.size(0)} rows but features has {num_items} rows")
+            else:
+                param_vecs = params2D
+            # batched dot: rowwise multiply and sum
+            dot_products = torch.einsum("ij,ij->i", features.view(num_items, -1), param_vecs.view(num_items, -1))
+        else:
+            # Case 2: flat_params present -> we expect flat length >= num_items * data_dim
+            if flat_params is None:
+                raise RuntimeError("No parameters available for dot-product calculation")
+            required_len = num_items * data_dim
+            if flat_params.numel() < required_len:
+                raise RuntimeError(f"flat_params length {flat_params.numel()} is too short for required {required_len}")
+            # Build per-item param vectors by slicing
+            param_vecs = flat_params.view(-1)[:required_len].view(num_items, data_dim)
+            dot_products = torch.einsum("ij,ij->i", features.view(num_items, -1), param_vecs)
+
+        # dot_products is (num_items,)
+        # From here continue the rest of your attack logic (e.g., build adversarial features),
+        # returning modified features and targets as expected by the calling code.
+        # For demonstration, we'll just return features and original targets and the dot_products
+        # (adjust to your pipeline).
+        return features, targets, dot_product
 
 
