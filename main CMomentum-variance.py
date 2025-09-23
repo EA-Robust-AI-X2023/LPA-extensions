@@ -46,7 +46,7 @@ args.lr_ctrl = 'constant'
 # dataset = ToySet(set_size=500, dimension=5, fix_seed=True)
 
 data_package = mnist()
-task = softmaxRegressionTask(data_package, batch_size=1)
+task = softmaxRegressionTask(data_package, batch_size=32)
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)
