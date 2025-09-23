@@ -419,98 +419,168 @@ class Gradient_attack(DataPoisoningAttack):
 
     def run(self, features, targets, model=None, parameters=None):
         """
-        Robust version of run for Gradient_attack.
-        - features: tensor-like (N, data_dim) or (data_dim,)
-        - targets: not modified here, kept for compatibility
-        - model: optional torch.nn.Module (server_model), used to infer appropriate parameter tensor
-        - parameters: optional explicit parameters input (list, tensor, etc). If None and model provided, derived from model.
-        Returns: same outputs your pipeline expects, but avoids shape-mismatch errors and provides clear messages.
-        """
+        Robust Gradient_attack.run
 
-        # ensure torch tensors
+        Returns:
+            features: (batch, data_dim) tensor (possibly flattened)
+            targets: (batch,) tensor (long)
+            dot_products: (batch,) tensor of dot(feature_i, param_vec_i) or similar depending on params
+        """
+        # --- ensure tensors ---
         if not torch.is_tensor(features):
             features = torch.tensor(features)
-        # normalize features to 2D: (num_items, data_dim)
-        if features.dim() == 1:
-            features = features.view(1, -1)
-        if features.dim() > 2:
-            features = features.view(features.size(0), -1)
-        num_items, data_dim = features.shape
+        if not torch.is_tensor(targets):
+            targets = torch.tensor(targets, dtype=torch.long)
 
-        # Acquire parameters source (prefer explicit arg if provided)
+        # --- normalize features to 2D: (batch, data_dim) ---
+        if features.dim() == 0:
+            features = features.view(1, -1)
+        elif features.dim() > 2:
+            # e.g., (batch, 1, 28, 28) -> (batch, 784)
+            features = features.view(features.size(0), -1)
+        elif features.dim() == 1:
+            features = features.view(1, -1)
+
+        num_items, data_dim = features.shape  # now safe
+
+        # --- Acquire parameters source ---
+        params2D = None   # will hold shape (rows, data_dim) if applicable
+        flat_params = None  # 1D tensor if applicable
+
         if parameters is None and model is not None:
-            # Try to find a parameter tensor whose last dim matches data_dim (e.g. weight matrix (out, in))
+            # Try to find a parameter tensor in the model whose last dim == data_dim (weight matrices)
             chosen = None
             for name, p in model.named_parameters():
                 if p is None:
                     continue
-                if p.dim() >= 1 and p.size(-1) == data_dim:
-                    chosen = p.detach()
-                    # choose the first reasonable match (common case)
+                pt = p.detach()
+                if pt.dim() >= 1 and pt.size(-1) == data_dim:
+                    chosen = pt
                     break
-
             if chosen is not None:
-                params2D = chosen.detach()
-                flat_params = None
-            else:
-                # fallback: flatten all parameters into 1D vector
-                flat_params = torch.cat([p.detach().view(-1) for p in model.parameters()]) if any(True for _ in model.parameters()) else None
-                params2D = None
-        else:
-            # explicit parameters passed
-            params = parameters
-            if isinstance(params, (list, tuple)):
-                # list of parameter tensors -> flatten them all
-                flat_params = torch.cat([p.detach().view(-1) for p in params])
-                params2D = None
-            elif torch.is_tensor(params):
-                if params.dim() == 2 and params.size(1) == data_dim:
-                    # each row is a params vector matching data_dim
-                    params2D = params.detach()
-                    flat_params = None
-                elif params.dim() == 1:
-                    flat_params = params.detach()
-                    params2D = None
+                if chosen.dim() == 1:
+                    flat_params = chosen.view(-1)
                 else:
-                    # unexpected shape: flatten to 1D but warn
-                    flat_params = params.detach().view(-1)
-                    params2D = None
+                    rows = int(chosen.numel() / data_dim)
+                    params2D = chosen.contiguous().view(rows, data_dim)
+            else:
+                # fallback: flatten all model parameters into a single vector
+                all_params = [p.detach().view(-1) for p in model.parameters()]
+                if len(all_params) == 0:
+                    raise RuntimeError("Model has no parameters to derive attack parameters from.")
+                flat_params = torch.cat(all_params, dim=0)
+
+        else:
+            # explicit parameters provided
+            params = parameters
+            if isinstance(params, dict):
+                found = None
+                for k, v in params.items():
+                    if torch.is_tensor(v) and v.dim() >= 1 and v.size(-1) == data_dim:
+                        found = v.detach()
+                        break
+                if found is not None:
+                    if found.dim() == 1:
+                        flat_params = found.view(-1)
+                    else:
+                        rows = int(found.numel() / data_dim)
+                        params2D = found.contiguous().view(rows, data_dim)
+                else:
+                    tensors = [v.detach().view(-1) for v in params.values() if torch.is_tensor(v)]
+                    if len(tensors) == 0:
+                        raise RuntimeError("Provided parameters dict contains no tensors.")
+                    flat_params = torch.cat(tensors, dim=0)
+
+            elif isinstance(params, (list, tuple)):
+                flat_params = torch.cat([p.detach().view(-1) for p in params], dim=0)
+
+            elif torch.is_tensor(params):
+                p = params.detach()
+                if p.dim() == 1:
+                    flat_params = p.view(-1)
+                elif p.dim() == 2 and p.size(1) == data_dim:
+                    params2D = p
+                else:
+                    if p.numel() % data_dim == 0:
+                        rows = p.numel() // data_dim
+                        params2D = p.contiguous().view(rows, data_dim)
+                    else:
+                        flat_params = p.view(-1)
             else:
                 raise TypeError(f"Unsupported parameters type: {type(params)}")
 
-        # Now compute dot-products worker-wise:
-        # Case 1: params2D present -> shape should be (num_workers, data_dim)
+        # --- Compute dot_products between each feature row and the corresponding parameter vector(s) ---
+        dot_products = None
+
         if params2D is not None:
+            rows = params2D.size(0)
             if params2D.size(1) != data_dim:
                 raise RuntimeError(f"params2D last dim {params2D.size(1)} != feature dim {data_dim}")
-            # if num_items equals number of rows we can batch dot as row-wise elementwise product sum
-            if params2D.size(0) != num_items:
-                # either broadcasting (if one param vector for all features) or mismatch
-                if params2D.size(0) == 1:
-                    # single parameter vector used for all features
-                    param_vecs = params2D.repeat(num_items, 1)
-                else:
-                    raise RuntimeError(f"params2D has {params2D.size(0)} rows but features has {num_items} rows")
-            else:
-                param_vecs = params2D
-            # batched dot: rowwise multiply and sum
-            dot_products = torch.einsum("ij,ij->i", features.view(num_items, -1), param_vecs.view(num_items, -1))
-        else:
-            # Case 2: flat_params present -> we expect flat length >= num_items * data_dim
-            if flat_params is None:
-                raise RuntimeError("No parameters available for dot-product calculation")
-            required_len = num_items * data_dim
-            if flat_params.numel() < required_len:
-                raise RuntimeError(f"flat_params length {flat_params.numel()} is too short for required {required_len}")
-            # Build per-item param vectors by slicing
-            param_vecs = flat_params.view(-1)[:required_len].view(num_items, data_dim)
-            dot_products = torch.einsum("ij,ij->i", features.view(num_items, -1), param_vecs)
 
-        # dot_products is (num_items,)
-        # From here continue the rest of your attack logic (e.g., build adversarial features),
-        # returning modified features and targets as expected by the calling code.
-        # For demonstration, we'll just return features and original targets and the dot_products
-        # (adjust to your pipeline).
-        return features, targets, dot_product
+            if rows == num_items:
+                # One param vector per example
+                dot_products = torch.einsum("ij,ij->i", features, params2D)
+            elif rows == 1:
+                # Single param vector applied to all examples
+                dot_products = torch.einsum("ij,j->i", features, params2D[0])
+            else:
+                # Common MNIST case: params2D has num_classes rows (e.g., 10)
+                # If targets are provided and valid, pick per-example param by target class
+                if targets is not None:
+                    if targets.dim() == 0:
+                        targets = targets.view(1)
+                    if targets.size(0) != num_items:
+                        raise RuntimeError(f"targets length {targets.size(0)} != batch size {num_items}")
+                    # If target indices are within rows, pick per-target vectors
+                    if targets.max().item() < rows:
+                        chosen_params = params2D[targets]  # (batch, data_dim)
+                        dot_products = torch.einsum("ij,ij->i", features, chosen_params)
+                    else:
+                        # otherwise compute full logits then gather (best effort)
+                        logits = features @ params2D.t()  # (batch, rows)
+                        dot_products = logits.gather(1, targets.view(-1, 1)).view(-1)
+                else:
+                    # No targets: compute logits and take max score per example as fallback
+                    logits = features @ params2D.t()
+                    dot_products = logits.max(dim=1).values
+
+        else:
+            # flat_params present
+            if flat_params is None:
+                raise RuntimeError("Neither params2D nor flat_params available to compute dot-products.")
+            flat_len = flat_params.numel()
+
+            if flat_len == data_dim:
+                dot_products = torch.einsum("ij,j->i", features, flat_params)
+            elif flat_len >= num_items * data_dim:
+                needed = num_items * data_dim
+                slice_vecs = flat_params[:needed].view(num_items, data_dim)
+                dot_products = torch.einsum("ij,ij->i", features, slice_vecs)
+            else:
+                if flat_len % data_dim == 0:
+                    rows = flat_len // data_dim
+                    slice_rows = flat_params.view(rows, data_dim)
+                    if rows == 1:
+                        dot_products = torch.einsum("ij,j->i", features, slice_rows[0])
+                    elif rows < num_items:
+                        times = (num_items + rows - 1) // rows
+                        tile = slice_rows.repeat(times, 1)[:num_items]
+                        dot_products = torch.einsum("ij,ij->i", features, tile)
+                    elif rows == num_items:
+                        dot_products = torch.einsum("ij,ij->i", features, slice_rows)
+                    else:
+                        dot_products = torch.einsum("ij,ij->i", features, slice_rows[:num_items])
+                else:
+                    raise RuntimeError(
+                        f"flat_params length {flat_len} incompatible with data_dim={data_dim} and batch={num_items}. "
+                        "Provide parameters shaped as (rows, data_dim), a flattened vector of length >= batch*data_dim, "
+                        "or a single vector of length data_dim."
+                    )
+
+        if dot_products is None:
+            raise RuntimeError("Failed to compute dot_products due to unexpected parameter/feature shapes.")
+
+        # --- Return features, targets, and dot_products (batch,) ---
+        return features, targets, dot_products
 
 
