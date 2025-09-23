@@ -433,6 +433,8 @@ class Gradient_attack(DataPoisoningAttack):
         # normalize features to 2D: (num_items, data_dim)
         if features.dim() == 1:
             features = features.view(1, -1)
+        if features.dim() > 2:
+            features = features.view(features.size(0), -1)
         num_items, data_dim = features.shape
 
         # Acquire parameters source (prefer explicit arg if provided)
