@@ -49,7 +49,7 @@ args.lr_ctrl = 'constant'
 
 data_package = mnist()
 task = softmaxRegressionTask(data_package, batch_size=32)
-task.super_params['display_interval'] = 15
+task.super_params['display_interval'] = 50
 
 # data_package = fashionmnist()
 # task = softmaxRegressionTask(data_package)

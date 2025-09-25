@@ -9,11 +9,12 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
-graph_name = 'Centralized_n=10_b=1'
+# graph_name = 'Centralized_n=10_b=1'
+graph_name = 'Centralized_n=100_b=10'
 attack_name = 'label_flipping'
 #attack_name = 'furthest_label_flipping'
 #attack_name = 'gradient_attack_label_flipping'
-attack_name = 'gradient_attack_label_flipping_omniscient_noniid'
+#attack_name = 'gradient_attack_label_flipping_omniscient_noniid'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -28,16 +29,16 @@ def draw(task_name):
     # datasets = ['cifar10']
     datasets = ['mnist']
     aggregations = [
-        ('mean', 'Baseline'), 
-        # ('mean', 'Mean'), 
+        #('mean', 'Baseline'), 
+        ('mean', 'Mean'), 
         # ('trimmed_mean', 'TriMean'),
-        # ('faba', 'FABA'), 
-        # ('CC', 'CC'),
+        ('faba', 'FABA'), 
+        ('CC', 'CC'),
         # ('LFighter', 'LFighter'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
-        # ('DirichletPartition_alpha=1', 'Mild Noniid'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid'),
         ('LabelSeperation', 'Noniid')
     ]
 
@@ -118,12 +119,12 @@ def draw_mnist(task_name):
     aggregations = [
         # ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
+        # ('trimmed_mean', 'TriMean'),
         ('faba', 'FABA'), 
         ('CC', 'CC'),
-        # ('LFighter', 'LFighter'),
+        ('LFighter', 'LFighter'),
         ('Krum', 'Krum'),
-        ('mKrum', 'mKrum'),
+        # ('mKrum', 'mKrum'),
     ]
     partition_names = [
         ('iidPartition', 'IID'),
@@ -146,14 +147,6 @@ def draw_mnist(task_name):
         axes[i].grid('on')
                 
         for agg_index, (agg_code_name, agg_show_name) in enumerate(aggregations):
-            
-            #pour CC, on a calculé que pour la distrib Noniid...
-            if agg_code_name == "CC":
-                if partition_names[i][1] != 'Noniid':
-                    continue
-            # if agg_code_name == 'Krum' or agg_code_name == 'mKrum':
-            #     if partition_names[i][1] != 'Noniid':
-            #         continue
 
             color = colors[agg_index]
             marker = markers[agg_index]
@@ -163,7 +156,7 @@ def draw_mnist(task_name):
                 agg_code_name += '_tau=0.3'
             if agg_show_name == 'Baseline':
                 file_name = method + '_baseline_mean'
-                file_path = [taskname, 'Centralized_n=10_b=0', partition_names[i][0]]
+                file_path = [taskname, graph_name, partition_names[i][0]]
             else:
                 file_name = method + '_' + attack_name + '_' + agg_code_name + ''
                 file_path = [taskname, graph_name, partition_names[i][0]]
