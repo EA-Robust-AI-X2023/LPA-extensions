@@ -53,8 +53,7 @@ class IterativeEnvironment(AlgorithmEnvironment):
         self.total_iterations = total_iterations
         
         # random number generator
-        self.rng_pack = RngPackage(seed=None)
-            
+        self.rng_pack = RngPackage(seed=self.seed if self.fix_seed else None)            
     def construct_rng_pack(self):
         # construct random number generator
         if self.fix_seed:
@@ -170,6 +169,9 @@ class Dist_Dataset_Opt_Env(Byz_Env, Opt_Env):
     def __init__(self, partition_cls: Partition=TrivalPartition, 
                  *args, **kw): 
         super().__init__(*args, **kw)
+        
+        if self.fix_seed:
+            self.rng_pack.set_seed(self.seed)
         
         train_set = self.data_package.train_set
         # # ====== distribute dataset ======

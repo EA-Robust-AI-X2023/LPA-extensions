@@ -1,5 +1,6 @@
 import random
 import torch
+import numpy as np
 
 class RngPackage():
     '''
@@ -31,9 +32,13 @@ class RngPackage():
         if seed is None:
             self.random = random
             self.torch = torch.default_generator
+            self.np_random = np.random  # Utilise le global si pas de seed
+            self.seed = None
         else:
             self.random = random_rng(seed)
             self.torch = torch_rng(seed)
+            self.np_random = np.random.RandomState(seed)
+            self.seed = seed
         
         
 def random_rng(seed=10):

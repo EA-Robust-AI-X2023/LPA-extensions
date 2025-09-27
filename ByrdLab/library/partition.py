@@ -88,7 +88,8 @@ class DirichletPartition(HorizotalPartition):
         Return:
             list[list[]]: The partitioned data.
         """
-        np.random.seed(seed=1)
+        np.random.seed(seed=self.rng_pack.seed)  
+
 
         current_min_size = 0
         data_size = len(self.dataset)
@@ -105,7 +106,8 @@ class DirichletPartition(HorizotalPartition):
             for k in range(self.class_cnt):
                 idx_k = all_index[k]
                 self.rng_pack.random.shuffle(idx_k)
-                proportions = np.random.dirichlet(np.repeat(self.alpha, self.node_cnt))
+                # proportions = np.random.dirichlet(np.repeat(self.alpha, self.node_cnt))
+                proportions = self.rng_pack.np_random.dirichlet(np.repeat(self.alpha, self.node_cnt))
                 # using the proportions from dirichlet, only select those nodes having data amount less than average
                 proportions = np.array(
                     [p * (len(idx_j) < data_size / self.node_cnt) for p, idx_j in zip(proportions, partition)])
