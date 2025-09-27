@@ -1,7 +1,7 @@
 from argsParser import args
 
 from ByrdLab import FEATURE_TYPE
-from ByrdLab.aggregation import C_mean, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter, C_Krum, C_mKrum
+from ByrdLab.aggregation import C_mean, C_median, C_trimmed_mean, C_faba, C_centered_clipping, C_LFighter, C_Krum, C_mKrum, D_median
 from ByrdLab.attack import C_gaussian, C_same_value, C_sign_flipping, feature_label_random, \
                             label_flipping, label_random, furthest_label_flipping, adversarial_label_flipping, feature_label_random
 from ByrdLab.centraliedAlgorithm import CSGD, CSGD_under_DPA, CMomentum_under_DPA, CMomentum_with_LFighter_under_DPA
@@ -187,8 +187,8 @@ if args.aggregation == 'mean':
     aggregation = C_mean(honest_nodes, byzantine_nodes)
 elif args.aggregation == 'trimmed-mean':
     aggregation = C_trimmed_mean(honest_nodes, byzantine_nodes)
-# elif args.aggregation == 'median':
-#     aggregation = D_median(graph)
+elif args.aggregation == 'median':
+    aggregation = C_median(honest_nodes, byzantine_nodes)
 # elif args.aggregation == 'geometric-median':
 #     aggregation = D_geometric_median(graph)
 elif args.aggregation == 'faba':

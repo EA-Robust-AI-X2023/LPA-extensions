@@ -978,7 +978,7 @@ class CMomentum_with_LFighter_under_DPA(Dist_Dataset_Opt_Env):
             for para, grad in zip(server_model.parameters(), aggrGrad):
                 para.data.sub_(grad, alpha = lr)
 
-        return server_model, loss_path, acc_path
+        return server_model, loss_path, acc_path, worker_momentum
     
 
 # CSGD under data poisoning attacks

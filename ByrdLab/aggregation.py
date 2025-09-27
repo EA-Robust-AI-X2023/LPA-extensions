@@ -385,6 +385,12 @@ class C_mKrum(CentraliedAggregation):
     def run(self, messages):
         return mKrum(wList = messages, byzantine_size = len(self.byzantine_nodes), m = 1)
 
+class C_median(CentraliedAggregation):
+    def __init__(self, honest_nodes, byzantine_nodes):
+        super().__init__(name='median', honest_nodes=honest_nodes, byzantine_nodes=byzantine_nodes)
+
+    def run(self, messages):
+        return torch.median(messages, dim=0)[0]
 
 class DecentralizedAggregation():
     def __init__(self, name, graph, superparameter={}):

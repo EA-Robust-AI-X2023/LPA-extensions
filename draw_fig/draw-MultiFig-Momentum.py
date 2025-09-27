@@ -10,8 +10,8 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-# attack_name = 'label_flipping'
-attack_name = 'furthest_label_flipping'
+attack_name = 'label_flipping'
+#attack_name = 'furthest_label_flipping'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -31,11 +31,18 @@ def draw(task_name):
         ('faba', 'FABA'), 
         ('CC', 'CC'),
         ('LFighter', 'LFighter'),
+        ('Krum', 'Krum'),
+        ('median', 'Median'),
     ]
     partition_names = [
-        ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
-        ('LabelSeperation', 'Noniid')
+        # ('iidPartition', 'IID'),
+        ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
+        ('DirichletPartition_alpha=10', 'Mild Noniid, 10'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid, 1'),
+        ('DirichletPartition_alpha=0.1', 'Mild Noniid, 0.1'),
+        ('DirichletPartition_alpha=0.01', 'Mild Noniid, 0.01'),
+        ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
+        # ('LabelSeperation', 'Noniid')
     ]
 
     pic_name = 'centralized_' + task_name + '_' + graph_name + '_' + method + '_' + attack_name
@@ -111,19 +118,25 @@ def draw_mnist(task_name):
     # datasets = ['mnist', 'cifar10']
     dataset = 'mnist'
 
-
     aggregations = [
-        ('mean', 'Baseline'), 
+        # ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
         ('trimmed_mean', 'TriMean'),
         ('faba', 'FABA'), 
         ('CC', 'CC'),
-        ('LFighter', 'LFighter'),
+        # ('LFighter', 'LFighter'),
+        ('Krum', 'Krum'),
+        ('median', 'Median'),
     ]
     partition_names = [
-        ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=1', 'Mild Noniid'),
-        ('LabelSeperation', 'Noniid')
+        # ('iidPartition', 'IID'),
+        ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
+        ('DirichletPartition_alpha=10', 'Mild Noniid, 10'),
+        ('DirichletPartition_alpha=1', 'Mild Noniid, 1'),
+        ('DirichletPartition_alpha=0.1', 'Mild Noniid, 0.1'),
+        ('DirichletPartition_alpha=0.01', 'Mild Noniid, 0.01'),
+        ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
+        # ('LabelSeperation', 'Noniid')
     ]
 
     pic_name = 'centralized_' + task_name + '_' + dataset + '_' + graph_name + '_' + method + '_' + attack_name
@@ -185,5 +198,5 @@ def draw_mnist(task_name):
     plt.show()
 
 if __name__ == '__main__':
-    draw('NeuralNetwork')
+    # draw('NeuralNetwork')
     draw_mnist('SR')

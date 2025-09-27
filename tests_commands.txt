@@ -1,0 +1,179 @@
+This .txt file presents the command line scripts for testing different dirichlet distributions.
+
+Les distributions de dirichlet sont variés via l'encodage suivant:
+a= 100
+b = 10
+c= 1
+d=0.1
+e= 0.01
+f=0.001
+
+
+
+First runs for mean, median, faba
+
+### Label flipping 
+
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation mean --attack label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation faba --attack label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation cc --attack label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation Krum --attack label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_f ; 
+
+
+##### furthest label flipping
+
+
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation faba --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_f ; 
+
+
+#No attack:
+
+
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation mean --attack none --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation faba --attack none --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation cc --attack none --data-partition dirichlet_f ; 
+
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation Krum --attack none --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation lfighter --attack none --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack none --data-partition dirichlet_f ; 
+
+
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_a ;
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_e ;
+python "main CMomentum.py" --aggregation median --attack none --data-partition dirichlet_f ; 
