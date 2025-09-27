@@ -4,7 +4,7 @@ from ByrdLab import attack
 from ByrdLab.aggregation import C_mean
 from ByrdLab.centraliedAlgorithm import CMomentum_under_DPA
 from ByrdLab.environment import Dist_Dataset_Opt_Env
-from ByrdLab.library.dataset import DistributedDataSets_over_honest_and_byz_nodes, mnist
+from ByrdLab.library.dataset import DistributedDataSets_over_honest_and_byz_nodes, cifar10, mnist
 from ByrdLab.library.partition import TrivalPartition, DirichletPartition_a
 from ByrdLab.tasks.softmaxRegression import softmaxRegressionTask
 import matplotlib.pyplot as plt
@@ -22,11 +22,11 @@ partition_classes = [
 
 fig, axes = plt.subplots(1, len(alphas), figsize=(4 * len(alphas), 6), sharey=True)
 
-seed = 50
+seed = 1
 
 
 for idx, (a, partition_cls) in enumerate(zip(alphas, partition_classes)):
-    data_package = mnist()
+    data_package = cifar10()
     task = softmaxRegressionTask(data_package, batch_size=32)
     step_agg = 1
     lr_ctrl = None

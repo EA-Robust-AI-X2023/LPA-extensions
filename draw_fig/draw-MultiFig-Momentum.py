@@ -10,8 +10,8 @@ markers = ['h', '+', 'v',  '^', 'x', 'o']
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-attack_name = 'label_flipping'
-#attack_name = 'furthest_label_flipping'
+# attack_name = 'label_flipping'
+attack_name = 'furthest_label_flipping'
 method = 'CMomentum'
 
 FONTSIZE = 50

@@ -11,7 +11,7 @@ parser.add_argument('--lr-ctrl', type=str, default='1/sqrt k')
 
 parser.add_argument('--no-fixed-seed', action='store_true',
                     help="If specifed, the random seed won't be fixed")
-parser.add_argument('--seed', type=int, default=100)
+parser.add_argument('--seed', type=int, default=1)
 
 parser.add_argument('--without-record', action='store_true',
                     help='If specifed, no file of running record and log will be left')
