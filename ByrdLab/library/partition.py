@@ -220,6 +220,11 @@ class DirichletPartition_e(DirichletPartition):
 class DirichletPartition_f(DirichletPartition):
     def __init__(self, dataset, node_cnt, rng_pack: RngPackage=RngPackage()):
         super().__init__(dataset, node_cnt, rng_pack, alpha=1e-3, min_size=4000)
+        
+class DirichletPartition_g(DirichletPartition):
+    def __init__(self, dataset, node_cnt, rng_pack: RngPackage=RngPackage()):
+        super().__init__(dataset, node_cnt, rng_pack, alpha=5*1e-2, min_size=4000)
+
 
 class iidPartition(HorizotalPartition):
     def __init__(self, dataset, node_cnt, rng_pack: RngPackage=RngPackage()) -> None:

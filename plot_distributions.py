@@ -9,13 +9,14 @@ from ByrdLab.library.partition import TrivalPartition, DirichletPartition_a
 from ByrdLab.tasks.softmaxRegression import softmaxRegressionTask
 import matplotlib.pyplot as plt
 import numpy as np
-from ByrdLab.library.partition import DirichletPartition_a, DirichletPartition_b, DirichletPartition_c, DirichletPartition_d, DirichletPartition_e, DirichletPartition_f
-alphas = [100, 10, 1, 0.1, 0.01, 0.001]  # Dirichlet 'a' values from a to f
+from ByrdLab.library.partition import DirichletPartition_a, DirichletPartition_b, DirichletPartition_c, DirichletPartition_d, DirichletPartition_e, DirichletPartition_f, DirichletPartition_g
+alphas = [100, 10, 1, 0.1, 0.05, 0.01, 0.001]  # Dirichlet 'a' values from a to f
 partition_classes = [
     DirichletPartition_a,
     DirichletPartition_b,
     DirichletPartition_c,
     DirichletPartition_d,
+    DirichletPartition_g,
     DirichletPartition_e,
     DirichletPartition_f
 ]
@@ -26,7 +27,7 @@ seed = 1
 
 
 for idx, (a, partition_cls) in enumerate(zip(alphas, partition_classes)):
-    data_package = cifar10()
+    data_package = mnist()
     task = softmaxRegressionTask(data_package, batch_size=32)
     step_agg = 1
     lr_ctrl = None

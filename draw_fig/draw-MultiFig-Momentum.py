@@ -4,14 +4,14 @@ import sys
 sys.path.append('..')
 from ByrdLab.library.cache_io import load_file_in_cache, set_cache_path
 
-colors = [ 'green', 'red',  'orange', 'blue', 'purple', 'olive']
-markers = ['h', '+', 'v',  '^', 'x', 'o']
+colors = [ 'green', 'red',  'orange', 'blue', 'purple', 'olive', 'brown', 'pink', 'gray', 'cyan']
+markers = ['h', '+', 'v',  '^', 'x', 'o', 's', 'D', '*', '1']
 
 # task_name = 'NeuralNetwork'
 # task_name = 'SR'
 graph_name = 'Centralized_n=10_b=1'
-# attack_name = 'label_flipping'
-attack_name = 'furthest_label_flipping'
+attack_name = 'label_flipping'
+# attack_name = 'furthest_label_flipping'
 method = 'CMomentum'
 
 FONTSIZE = 50
@@ -22,10 +22,10 @@ __CACHE_PATH__ = os.path.join(__FILE_DIR__, os.path.pardir, __CACHE_DIR__)
 set_cache_path(__CACHE_PATH__)
 
 def draw(task_name):
-    datasets = ['mnist', 'cifar10']
-    # datasets = ['cifar10']
+    # datasets = ['mnist', 'cifar10']
+    datasets = ['cifar10']
     aggregations = [
-        ('mean', 'Baseline'), 
+        # ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
         ('trimmed_mean', 'TriMean'),
         ('faba', 'FABA'), 
@@ -36,12 +36,12 @@ def draw(task_name):
     ]
     partition_names = [
         # ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
+        # ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
         ('DirichletPartition_alpha=10', 'Mild Noniid, 10'),
         ('DirichletPartition_alpha=1', 'Mild Noniid, 1'),
         ('DirichletPartition_alpha=0.1', 'Mild Noniid, 0.1'),
         ('DirichletPartition_alpha=0.01', 'Mild Noniid, 0.01'),
-        ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
+        # ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
         # ('LabelSeperation', 'Noniid')
     ]
 
@@ -51,7 +51,7 @@ def draw(task_name):
 
     axes[0][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
     axes[1][0].set_ylabel('Accuracy', fontsize=FONTSIZE)
-    axes[0][0].set_ylim(0.4, 0.98)
+    # axes[0][0].set_ylim(0.4, 0.98)
 
     
 
@@ -83,7 +83,7 @@ def draw(task_name):
                 x_axis = [r*record['display_interval']
                             for r in range(record['rounds']+1)]
 
-                axes[l][i].plot(x_axis, acc_path, '-', color=color, marker=marker, label=agg_show_name, markevery=20, linewidth=4, markersize=20)
+                axes[l][i].plot(x_axis, acc_path, '-', color=color, marker=marker, label=agg_show_name, markevery=20, linewidth=2, markersize=10)
 
 
     handles, labels = axes[0][0].get_legend_handles_labels()
@@ -121,21 +121,21 @@ def draw_mnist(task_name):
     aggregations = [
         # ('mean', 'Baseline'), 
         ('mean', 'Mean'), 
-        ('trimmed_mean', 'TriMean'),
+        # ('trimmed_mean', 'TriMean'),
         ('faba', 'FABA'), 
         ('CC', 'CC'),
         # ('LFighter', 'LFighter'),
-        ('Krum', 'Krum'),
-        ('median', 'Median'),
+        # ('Krum', 'Krum'),
+        # ('median', 'Median'),
     ]
     partition_names = [
         # ('iidPartition', 'IID'),
-        ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
+        # ('DirichletPartition_alpha=100', 'Mild Noniid, 100'),
         ('DirichletPartition_alpha=10', 'Mild Noniid, 10'),
         ('DirichletPartition_alpha=1', 'Mild Noniid, 1'),
         ('DirichletPartition_alpha=0.1', 'Mild Noniid, 0.1'),
-        ('DirichletPartition_alpha=0.01', 'Mild Noniid, 0.01'),
-        ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
+        # ('DirichletPartition_alpha=0.01', 'Mild Noniid, 0.01'),
+        # ('DirichletPartition_alpha=0.001', 'Mild Noniid, 0.001'),
         # ('LabelSeperation', 'Noniid')
     ]
 
@@ -163,7 +163,7 @@ def draw_mnist(task_name):
                 file_name = method + '_baseline_mean'
                 file_path = [taskname, 'Centralized_n=10_b=0', partition_names[i][0]]
             else:
-                file_name = method + '_' + attack_name + '_' + agg_code_name + ''
+                file_name = method + '_' + attack_name + '_' + agg_code_name + '_100'
                 file_path = [taskname, graph_name, partition_names[i][0]]
             record = load_file_in_cache(file_name, path_list=file_path)
             acc_path = record['acc_path']
@@ -190,7 +190,7 @@ def draw_mnist(task_name):
     if not os.path.isdir(dir_png_path):
         os.makedirs(dir_png_path)
 
-    suffix = ''
+    suffix = '_seed_100'
     pic_png_path = os.path.join(dir_png_path, pic_name + suffix + '.png')
     pic_pdf_path = os.path.join(dir_pdf_path, pic_name + suffix + '.pdf')
     plt.savefig(pic_png_path, format='png', bbox_inches='tight')

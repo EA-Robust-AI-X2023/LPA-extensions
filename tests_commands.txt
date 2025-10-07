@@ -233,3 +233,54 @@ python "main CMomentum.py" --aggregation median --attack furthest_label_flipping
 python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_c ;
 python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_d ;
 python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+
+##restent à faire pour static:
+
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_b ;
+
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation median --attack label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack label_flipping --data-partition dirichlet_c ;
+
+
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_d ;
+
+python "main CMomentum.py" --aggregation lfighter --attack label_flipping --data-partition dirichlet_e ;
+
+
+##restent à faire pour dynamic
+
+
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation mean --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation cc --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation Krum --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation lfighter --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation trimmed-mean --attack furthest_label_flipping --data-partition dirichlet_e ;
+
+
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_b ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_c ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_d ;
+python "main CMomentum.py" --aggregation median --attack furthest_label_flipping --data-partition dirichlet_e ;
